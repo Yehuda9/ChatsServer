@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private static ContactsIService contactsIService = new ContactsService();
+    private static ContactsIService contactsIService;
+
+    public ContactsController(ContactsIService cis)
+    {
+        contactsIService = cis;
+    }
 
     [HttpGet]
     public ActionResult<string> getAllContacts()
