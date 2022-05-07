@@ -11,7 +11,7 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private static UsersIService? usersService;
+        private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
 
         public UsersController(IConfiguration configuration,UsersIService usersIService)
@@ -31,6 +31,7 @@ namespace JWTAuthentication.NET6._0.Controllers
                 var authClaims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("name", name),
                 };
 
                 var token = getToken(authClaims);

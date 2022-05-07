@@ -8,53 +8,61 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private static ContactsIService contactsIService;
+    private readonly ContactsIService? contactsIService;
+    private readonly UsersIService? usersIService;
 
-    public ContactsController(ContactsIService cis)
+
+    public ContactsController(ContactsIService cis,UsersIService uis)
     {
         contactsIService = cis;
+        usersIService = uis;
     }
 
     [HttpGet]
     public ActionResult<string> getAllContacts()
     {
-        return JsonSerializer.Serialize(contactsIService.getAll());
+        return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
     }
     [HttpPost]
     public IActionResult createContact(string id, string name, string server)
     {
-        contactsIService.create(new Contact(id, name, server));
-        return StatusCode(200);
+        contactsIService.create(getUser(),new Contact(id, name, server));
+        return Ok();
     }
     [HttpGet]
     [Route("{id}")]
     public ActionResult<string> getContact(string id)
     {
-        return JsonSerializer.Serialize(contactsIService.get(id));
+        return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
     }
     [HttpPut]
     [Route("{id}")]
     public ActionResult<string> editContact(string id, string name, string server)
     {
-        contactsIService.update(new Contact(id, name, server));
-        return StatusCode(200);
+        contactsIService.update(getUser(), new Contact(id, name, server));
+        return Ok();
     }
     [HttpDelete]
     [Route("{id}")]
     public ActionResult<string> deleteContact(string id)
     {
-        contactsIService.delete(id);
-        return StatusCode(200);
+        contactsIService.delete(getUser(), id);
+        return Ok();
     }
     [HttpGet]
     [Route("{id}/messages")]
     public ActionResult<string> getContactMessages(string id)
     {
-       return JsonSerializer.Serialize((contactsIService.get(id).chats));
+       return JsonSerializer.Serialize((contactsIService.get(getUser(), id).chats));
     }
-
-
-
+    private User getUser()
+    {
+        string name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
+        if (name == null) { return null; }
+        User user = usersIService.getUserByName(name);
+        if (user == null) { return null; }
+        return user;
+    }
 }
 
 
