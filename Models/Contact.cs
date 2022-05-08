@@ -4,11 +4,11 @@
 public class Contact
 
 {
-    public Contact(string id,string name="",string server="")
+    public Contact(string id, string name = "", string server = "")
     {
         this.id = id;
         this.name = name;
-        this.chats=new List<Chat>();
+        this.messages = new List<Message>();
         this.server = server;
         this.last = "";
         this.lastdate = new DateTime();
@@ -17,9 +17,13 @@ public class Contact
     public string? id { get; set; }
     public string name { get; set; }
     public string server { get; set; }
-    public List<Chat> chats { get; set; }
+    public List<Message> messages { get; set; }
     public string last { get; set; }
     public DateTime lastdate { get; set; }
+    public void addMessage(string content)
+    {
+        messages.Add(new Message(messages.Capacity + 1, content));
+    }
     public override bool Equals(Object? obj)
     {
         if ((obj == null) || !this.GetType().Equals(obj.GetType()))
@@ -29,7 +33,7 @@ public class Contact
         else
         {
             Contact c = (Contact)obj;
-            return this.id==c.id;
+            return this.id == c.id;
         }
     }
 

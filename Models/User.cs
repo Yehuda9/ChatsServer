@@ -3,17 +3,21 @@
 public class User
 {
     [Key]
-    public string id { get; set; }
+    public string idName { get; set; }
     [Required]
     public string password { get; set; }
-    public string name { get; set; }
+    public string nickName { get; set; }
     public List<Contact> contacts { get; set; } 
     public User(string id,string password,string name)
     {
-        this.id = id;
+        this.idName = id;
         this.password = password;   
-        this.name = name;
+        this.nickName = name;
         this.contacts = new List<Contact>();
+    }
+   public Contact? GetContact(string id)
+    {
+        return this.contacts.Find(x => x.id == id); 
     }
 }
 

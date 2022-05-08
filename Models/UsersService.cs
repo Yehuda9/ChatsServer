@@ -1,6 +1,6 @@
 ﻿public class UsersService : UsersIService
 {
-    private static List<User> usersList = new List<User>();
+    private static List<User> usersList = new();
 
     public bool checkPassword(User user, string password)
     {
@@ -13,7 +13,7 @@
 
     public void create(string id, string name, string password)
     {
-        User user = new User(id, password, name);
+        User? user = new(id, password, name);
         if (!usersList.Contains(user))
         {
             usersList.Add(user);
@@ -22,29 +22,24 @@
 
     public void delete(string id)
     {
-        User user = usersList.Find(x => x.id == id);
+        User? user = usersList.Find(x => x.idName == id);
         if (user != null)
         {
             usersList.Remove(user);
         }
     }
 
-    public User getUserById(string id)
+    public User get(string id)
     {
-        return usersList.Find(x => x.id == id);
-    }
-
-    public User getUserByName(string name)
-    {
-        return usersList.Find(x => x.name == name);
+        return usersList.Find(x => x.idName == id);
     }
 
     public void update(string id, string name, string password)
     {
-        User user = usersList.Find(x => x.id == id);
+        User? user = usersList.Find(x => x.idName == id);
         if (user != null)
         {
-            user.name = name;
+            user.nickName = name;
             user.password = password;
         }
     }

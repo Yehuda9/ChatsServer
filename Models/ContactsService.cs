@@ -1,6 +1,10 @@
-﻿
-public class ContactsService : ContactsIService
+﻿public class ContactsService : ContactsIService
 {
+    public void addMessage(Contact contact, string content)
+    {
+        contact.addMessage(content);
+    }
+
     public void create(User user, Contact contact)
     {
         if (!user.contacts.Contains(contact))
@@ -23,6 +27,11 @@ public class ContactsService : ContactsIService
     public IReadOnlyCollection<Contact> getAll(User user)
     {
         return user.contacts.AsReadOnly();
+    }
+
+    public Contact getContact(User user,string id)
+    {
+        return user.GetContact(id);
     }
 
     public void update(User user, Contact contact)
