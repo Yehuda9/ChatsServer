@@ -6,5 +6,7 @@
     void update(User user,Contact contact);
     void create(User user,Contact contact);
     void addMessage(Contact contact,string content);
+    void editMessage(Contact contact,int id, string content);
+
     Contact getContact(User user, string id);
 }

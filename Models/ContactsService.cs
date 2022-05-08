@@ -19,6 +19,11 @@
         if (c != null) { user.contacts.Remove(c); }
     }
 
+    public void editMessage(Contact contact, int id, string content)
+    {
+        contact.editMessage(id, content);
+    }
+
     public Contact get(User user, string id)
     {
         return user.contacts.Find(x => x.id == id);

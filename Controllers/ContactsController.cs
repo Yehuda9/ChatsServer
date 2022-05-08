@@ -116,6 +116,33 @@ public class ContactsController : ControllerBase
             return Unauthorized();
         }
     }
+    [HttpGet]
+    [Route("{id}/messages/{id2}")]
+    public ActionResult<string> getContactMessage(string id, int id2)
+    {
+        try
+        {
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized();
+        }
+    }
+    [HttpPut]
+    [Route("{id}/messages/{id2}")]
+    public ActionResult<string> editContactMessage(string id, int id2,string content)
+    {
+        try
+        {
+            contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized();
+        }
+    }
     private User? getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;

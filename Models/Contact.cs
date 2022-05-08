@@ -24,6 +24,12 @@ public class Contact
     {
         messages.Add(new Message(messages.Capacity + 1, content));
     }
+    public void editMessage(int id, string content)
+    {
+        Message? message = messages.Find(x => x.id == id);
+        if (message == null) { return; }
+        message.content = content;
+    }
     public override bool Equals(Object? obj)
     {
         if ((obj == null) || !this.GetType().Equals(obj.GetType()))
