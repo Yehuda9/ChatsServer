@@ -8,13 +8,11 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly ContactsIService? contactsIService;
     private readonly UsersIService? usersIService;
 
 
-    public ContactsController(ContactsIService cis, UsersIService uis)
+    public ContactsController(UsersIService uis)
     {
-        contactsIService = cis;
         usersIService = uis;
     }
 
@@ -23,7 +21,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
+            return JsonSerializer.Serialize(getUser().contacts);
         }
         catch (Exception ex)
         {
@@ -35,7 +33,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.create(getUser(), new Contact(id, name, server));
+
+            getUser().contacts.Add(new Contact(id, name, server));
             return Ok();
         }
         catch (Exception ex)
@@ -50,8 +49,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
-
+            return JsonSerializer.Serialize(getUser().getContact(id));
         }
         catch (Exception ex)
         {
@@ -64,9 +62,11 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.update(getUser(), new Contact(id, name, server));
+            Contact? contact = getUser().getContact(id);
+            if (contact == null) { return BadRequest(); }
+            contact.name = name;
+            contact.server = server;
             return Ok();
-
         }
         catch (Exception ex)
         {
@@ -79,9 +79,10 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.delete(getUser(), id);
+            Contact? contact = getUser().getContact(id);
+            if(contact == null) { return BadRequest(); }
+            getUser().contacts.Remove(contact);
             return Ok();
-
         }
         catch (Exception ex)
         {
@@ -94,7 +95,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
+            return JsonSerializer.Serialize(getUser().getContact(id).messages);
         }
         catch (Exception ex)
         {
@@ -103,11 +104,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id,string content)
+    public IActionResult createContactMessage(string id, string content)
     {
         try
-        {          
-            contactsIService.addMessage(getUser().GetContact(id), content);
+        {
+            getUser().getContact(id).addMessage(content);
             return Ok();
 
         }
@@ -122,7 +123,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
+            return JsonSerializer.Serialize(getUser().getContact(id).messages.Find(x=>x.id==id2));
         }
         catch (Exception ex)
         {
@@ -131,11 +132,25 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2,string content)
+    public ActionResult<string> editContactMessage(string id, int id2, string content)
     {
         try
         {
-            contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            getUser().getContact(id).editMessage(id2 , content); 
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized();
+        }
+    }
+    [HttpDelete]
+    [Route("{id}/messages/{id2}")]
+    public ActionResult<string> deleteContactMessage(string id, int id2, string content)
+    {
+        try
+        {
+            getUser().getContact(id).deleteMessage(id2 , content);  
             return Ok();
         }
         catch (Exception ex)

@@ -30,6 +30,12 @@ public class Contact
         if (message == null) { return; }
         message.content = content;
     }
+    public void deleteMessage(int id, string content)
+    {
+        Message? message = messages.Find(x => x.id == id);
+        if (message == null) { return; }
+        messages.Remove(message);
+    }
     public override bool Equals(Object? obj)
     {
         if ((obj == null) || !this.GetType().Equals(obj.GetType()))

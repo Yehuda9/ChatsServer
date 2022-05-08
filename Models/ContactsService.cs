@@ -15,8 +15,13 @@
 
     public void delete(User user, string id)
     {
-        Contact c = user.contacts.Find(x => x.id == id);
+        Contact? c = user.contacts.Find(x => x.id == id);
         if (c != null) { user.contacts.Remove(c); }
+    }
+
+    public void deleteMessage(Contact contact, int id, string content)
+    {
+        contact.deleteMessage(id, content);
     }
 
     public void editMessage(Contact contact, int id, string content)
@@ -36,12 +41,12 @@
 
     public Contact getContact(User user,string id)
     {
-        return user.GetContact(id);
+        return user.getContact(id);
     }
 
     public void update(User user, Contact contact)
     {
-        Contact c = user.contacts.Find(x => x.id == contact.id);
+        Contact? c = user.contacts.Find(x => x.id == contact.id);
 
         if (c != null)
         {

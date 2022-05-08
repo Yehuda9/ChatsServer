@@ -15,7 +15,7 @@ public class User
         this.nickName = name;
         this.contacts = new List<Contact>();
     }
-   public Contact? GetContact(string id)
+   public Contact? getContact(string id)
     {
         return this.contacts.Find(x => x.id == id); 
     }
