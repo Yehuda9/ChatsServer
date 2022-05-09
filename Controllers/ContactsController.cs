@@ -8,11 +8,13 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
+    private readonly ContactsIService? contactsIService;
     private readonly UsersIService? usersIService;
 
 
-    public ContactsController(UsersIService uis)
+    public ContactsController(ContactsIService cis, UsersIService uis)
     {
+        contactsIService = cis;
         usersIService = uis;
     }
 
@@ -21,7 +23,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().contactsService.getAll());
+            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
         }
         catch (Exception ex)
         {
@@ -33,7 +35,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().contactsService.create(new Contact(id, name, server));
+            contactsIService.create(getUser(), new Contact(id, name, server));
             return Ok();
         }
         catch (Exception ex)
@@ -48,7 +50,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().contactsService.get(id));
+            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
+
         }
         catch (Exception ex)
         {
@@ -61,12 +64,9 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().contactsService.update(new Contact(id, name, server));
-            /*Contact? contact = getUser().contactsIService.get(id);
-            if (contact == null) { return BadRequest(); }
-            contact.name = name;
-            contact.server = server;*/
+            contactsIService.update(getUser(), new Contact(id, name, server));
             return Ok();
+
         }
         catch (Exception ex)
         {
@@ -79,11 +79,9 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().contactsService.delete(id);
-            /*Contact? contact = getUser().getContact(id);
-            if(contact == null) { return BadRequest(); }
-            getUser().contacts.Remove(contact);*/
+            contactsIService.delete(getUser(), id);
             return Ok();
+
         }
         catch (Exception ex)
         {
@@ -96,7 +94,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().contactsService.get(id).messages);
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
         }
         catch (Exception ex)
         {
@@ -105,11 +103,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id, string content)
+    public IActionResult createContactMessage(string id,string content)
     {
         try
-        {
-            getUser().contactsService.get(id).addMessage(content);
+        {          
+            contactsIService.addMessage(getUser().GetContact(id), content);
             return Ok();
 
         }
@@ -124,7 +122,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().contactsService.get(id).messages.Find(x=>x.id==id2));
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
         }
         catch (Exception ex)
         {
@@ -133,25 +131,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2, string content)
+    public ActionResult<string> editContactMessage(string id, int id2,string content)
     {
         try
         {
-            getUser().contactsService.get(id).editMessage(id2 , content); 
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized();
-        }
-    }
-    [HttpDelete]
-    [Route("{id}/messages/{id2}")]
-    public ActionResult<string> deleteContactMessage(string id, int id2, string content)
-    {
-        try
-        {
-            getUser().contactsService.get(id).deleteMessage(id2 , content);  
+            contactsIService.editMessage(getUser().GetContact(id), id2, content);
             return Ok();
         }
         catch (Exception ex)
