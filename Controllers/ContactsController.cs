@@ -35,8 +35,12 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            
-            contactsIService.create(getUser(), new Contact(id, name, server));
+            User user = contactsIService.get(getUser(),id);
+            if(user == null)
+            {
+                usersIService.create(id, name,server);
+            }
+            contactsIService.create(getUser(), id);
             return Ok();
         }
         catch (Exception ex)
@@ -65,7 +69,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.update(getUser(), new Contact(id, name, server));
+            contactsIService.update(getUser(), new User(id, name, server));
             return Ok();
 
         }
@@ -95,7 +99,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {
@@ -123,7 +127,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {

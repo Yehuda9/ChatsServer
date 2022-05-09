@@ -1,4 +1,4 @@
-﻿public class UsersService : UsersIService
+﻿/*public class UsersService : UsersIService
 {
     private static List<User> usersList = new() { new("y", "1", "y") };
     private readonly DataContext context=new();
@@ -50,3 +50,4 @@
     }
 }
 
+*/

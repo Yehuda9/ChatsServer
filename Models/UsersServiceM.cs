@@ -10,17 +10,17 @@
         return false;
     }
 
-    public void create(string id, string name, string password)
+    public void create(string id, string name, string server, string password = "")
     {
-        
-        User? user = new(id, password, name);
+
+        User? user = new(name,server,password);
         if (!context.users.Contains(user))
         {
             context.users.Add(user);
             context.SaveChanges();
-
         }
     }
+
 
     public void delete(string id)
     {
