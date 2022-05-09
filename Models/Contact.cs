@@ -20,6 +20,7 @@ public class Contact
     public List<Message> messages { get; set; }
     public string last { get; set; }
     public DateTime lastdate { get; set; }
+    public string userId { get; set; }
     public void addMessage(string content)
     {
         messages.Add(new Message(messages.Capacity + 1, content));

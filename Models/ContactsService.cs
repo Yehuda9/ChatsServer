@@ -1,5 +1,7 @@
-﻿public class ContactsService : ContactsIService
+﻿public class ContactsService 
 {
+    private readonly DataContext context = new();
+
     public void addMessage(Contact contact, string content)
     {
         contact.addMessage(content);
@@ -7,6 +9,8 @@
 
     public void create(User user, Contact contact)
     {
+        context.Add(contact);
+
         if (!user.contacts.Contains(contact))
         {
             user.contacts.Add(contact);

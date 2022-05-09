@@ -28,7 +28,6 @@ namespace JWTAuthentication.NET6._0.Controllers
         public  IActionResult login(string name,string password)
         {
             var user = usersService.get(name);
-            
 
             if (user != null &&  usersService.checkPassword(user, password))
             {

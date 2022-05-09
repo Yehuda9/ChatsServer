@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Chats.Migrations
 {
-    [DbContext(typeof(UserContext))]
-    [Migration("20220509075954_InitialMigration")]
-    partial class InitialMigration
+    [DbContext(typeof(DataContext))]
+    [Migration("20220509142141_create")]
+    partial class create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -90,7 +90,7 @@ namespace Chats.Migrations
 
                     b.HasKey("idName");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Contact", b =>

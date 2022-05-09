@@ -35,6 +35,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
+            
             contactsIService.create(getUser(), new Contact(id, name, server));
             return Ok();
         }
@@ -107,7 +108,7 @@ public class ContactsController : ControllerBase
     {
         try
         {          
-            contactsIService.addMessage(getUser().GetContact(id), content);
+            //contactsIService.addMessage(contactsIService.get(id), content);
             return Ok();
 
         }
@@ -135,7 +136,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            //contactsIService.editMessage(getUser().GetContact(id), id2, content);
             return Ok();
         }
         catch (Exception ex)
@@ -143,13 +144,13 @@ public class ContactsController : ControllerBase
             return Unauthorized();
         }
     }
-    private User? getUser()
+    private string? getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
         User user = usersIService.get(name);
         if (user == null) { return null; }
-        return user;
+        return user.idName;
     }
 }
 
