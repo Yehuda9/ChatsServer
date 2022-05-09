@@ -18,7 +18,7 @@ public class UserContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property<string>("Id").HasColumnName("id");
-            entity.HasMany(e=>e.Com);
+            //entity.HasMany(e=>e.Com);
         });
         modelBuilder.Entity<User>().ToTable("users");
     }

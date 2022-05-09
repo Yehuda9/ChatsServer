@@ -63,9 +63,9 @@ namespace JWTAuthentication.NET6._0.Controllers
         [Route("register")]
         public IActionResult register(string name,string password)
         {
-            var userExists = userContext.users.;
+            //var userExists = userContext.users.;
 
-            //var userExists =  usersService.get(name);
+            var userExists =  usersService.get(name);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
             usersService.create(name, name, password);
