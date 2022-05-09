@@ -26,7 +26,7 @@
 
     public void delete(string id)
     {
-        User? user = usersList.Find(x => x.idName == id);
+        User? user = usersList.Find(x => x.name == id);
         if (user != null)
         {
             usersList.Remove(user);
@@ -36,12 +36,12 @@
     public User get(string id)
     {
         //return context.users.Find(id);
-        return usersList.Find(x => x.idName == id);
+        return usersList.Find(x => x.name == id);
     }
 
     public void update(string id, string name, string password)
     {
-        User? user = usersList.Find(x => x.idName == id);
+        User? user = usersList.Find(x => x.name == id);
         if (user != null)
         {
             user.nickName = name;

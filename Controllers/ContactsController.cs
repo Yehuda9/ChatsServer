@@ -150,7 +150,7 @@ public class ContactsController : ControllerBase
         if (name == null) { return null; }
         User user = usersIService.get(name);
         if (user == null) { return null; }
-        return user.idName;
+        return user.name;
     }
 }
 

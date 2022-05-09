@@ -1,10 +1,11 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 public class Message
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int id { get; set; }
+    [Key]
+    public string id { get; set; }
     public DateTime created { get; set; }
     public string? content { get; set; }
     public bool sent { get; set; }
@@ -17,6 +18,7 @@ public class Message
         this.created = DateTime.Now;
         this.fromId = from;
         this.toId = to;
+        this.id = fromId + "," + toId;
     }
 }
 
