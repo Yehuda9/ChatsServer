@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,6 +13,7 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly DbContext userContext;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
 
@@ -18,6 +21,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         {
             usersService = usersIService;
             _configuration = configuration;
+            userContext = new UserContext();
         }
 
         [HttpPost]
@@ -25,6 +29,9 @@ namespace JWTAuthentication.NET6._0.Controllers
         public  IActionResult login(string name,string password)
         {
             var user = usersService.get(name);
+            userContext.Add(new User(name,password,name));
+            userContext.SaveChanges();
+
             if (user != null &&  usersService.checkPassword(user, password))
             {
 
@@ -44,12 +51,21 @@ namespace JWTAuthentication.NET6._0.Controllers
             }
             return Unauthorized();
         }
+       /* [Authorize]
+        [HttpPost]
+        [Route("logout")]
+        public  IActionResult logout()
+        {
+
+        }*/
 
         [HttpPost]
         [Route("register")]
         public IActionResult register(string name,string password)
         {
-            var userExists =  usersService.get(name);
+            var userExists = userContext.users.;
+
+            //var userExists =  usersService.get(name);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
             usersService.create(name, name, password);

@@ -8,6 +8,9 @@ public class User
     public string password { get; set; }
     public string nickName { get; set; }
     public List<Contact> contacts { get; set; } 
+    public User()
+    {
+    }
     public User(string id,string password,string name)
     {
         this.idName = id;

@@ -17,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ContactsIService, ContactsService>();
 builder.Services.AddScoped<UsersIService, UsersService>();
+//builder.Services.AddDbContext<User>(options => options.U(Configuration.GetConnectionString("DataContext")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

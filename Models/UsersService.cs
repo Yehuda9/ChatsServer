@@ -1,6 +1,6 @@
 ﻿public class UsersService : UsersIService
 {
-    private static List<User> usersList = new() {/*new("y","1","y")*/ };
+    private static List<User> usersList = new() { new("y", "1", "y") };
 
     public bool checkPassword(User user, string password)
     {
