@@ -8,14 +8,15 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly ContactsIService? contactsIService;
-    private readonly UsersIService? usersIService;
+    //private readonly ContactsIService? contactsIService;
+    //private readonly UsersIService? usersIService;
+    private readonly DataContext? db;
 
 
-    public ContactsController(ContactsIService cis, UsersIService uis)
+    public ContactsController()
     {
-        contactsIService = cis;
-        usersIService = uis;
+        //usersIService = uis;
+        db = new DataContext();
     }
 
     [HttpGet]
@@ -23,7 +24,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
+            User? user = db.users.Find(getUser());
+            return JsonSerializer.Serialize(db.contacts.Where(c => user.contactsId.Contains(c.id)));
         }
         catch (Exception ex)
         {
@@ -35,7 +37,9 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.create(getUser(), new Contact(id, name, server));
+            db.users.Find(getUser()).contactsId.Add(id);
+            db.Add(new ContactModel(id, name, server));
+            db.SaveChanges();
             return Ok();
         }
         catch (Exception ex)
@@ -50,7 +54,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
+            return JsonSerializer.Serialize(db.contacts.Find(id));
 
         }
         catch (Exception ex)
@@ -64,7 +68,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.update(getUser(), new Contact(id, name, server));
+            db.contacts.Update(new ContactModel(id, name, server));
+            db.SaveChanges();
             return Ok();
 
         }
@@ -79,7 +84,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.delete(getUser(), id);
+            db.contacts.Remove(db.contacts.Find(id));
+            db.SaveChanges();
             return Ok();
 
         }
@@ -94,7 +100,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
+            return JsonSerializer.Serialize(db.messages.Where(x => (x.fromId == getUser() && x.toId == id) || (x.toId == getUser() && x.fromId == id)));
         }
         catch (Exception ex)
         {
@@ -103,11 +109,12 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id,string content)
+    public IActionResult createContactMessage(string id, string content)
     {
         try
-        {          
-            contactsIService.addMessage(getUser().GetContact(id), content);
+        {
+            db.messages.Add(new Message(content,id,getUser()));
+            db.SaveChanges();   
             return Ok();
 
         }
@@ -122,7 +129,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
+            return JsonSerializer.Serialize(db.messages.);
         }
         catch (Exception ex)
         {
@@ -131,7 +138,7 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2,string content)
+    public ActionResult<string> editContactMessage(string id, int id2, string content)
     {
         try
         {
@@ -143,13 +150,13 @@ public class ContactsController : ControllerBase
             return Unauthorized();
         }
     }
-    private User? getUser()
+    private string getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User user = usersIService.get(name);
+        User? user = db.users.Find(name);
         if (user == null) { return null; }
-        return user;
+        return user.idName;
     }
 }
 

@@ -17,22 +17,22 @@ namespace JWTAuthentication.NET6._0.Controllers
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
 
-        public UsersController(IConfiguration configuration,UsersIService usersIService)
+        public UsersController(IConfiguration configuration, UsersIService usersIService)
         {
             usersService = usersIService;
             _configuration = configuration;
-            userContext = new UserContext();
+            userContext = new DataContext();
         }
 
         [HttpPost]
         [Route("login")]
-        public  IActionResult login(string name,string password)
+        public IActionResult login(string name, string password)
         {
             var user = usersService.get(name);
-            userContext.Add(new User(name,password,name));
+            userContext.Add(new User(name, password, name));
             userContext.SaveChanges();
 
-            if (user != null &&  usersService.checkPassword(user, password))
+            if (user != null && usersService.checkPassword(user, password))
             {
 
                 var authClaims = new List<Claim>
@@ -51,19 +51,19 @@ namespace JWTAuthentication.NET6._0.Controllers
             }
             return Unauthorized();
         }
-       /* [Authorize]
-        [HttpPost]
-        [Route("logout")]
-        public  IActionResult logout()
-        {
+        /* [Authorize]
+         [HttpPost]
+         [Route("logout")]
+         public  IActionResult logout()
+         {
 
-        }*/
+         }*/
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register(string name,string password)
+        public IActionResult register(string name, string password)
         {
-            var userExists = userContext.users.;
+            var userExists = new DataContext().users.Where(x => x.idName == name);
 
             //var userExists =  usersService.get(name);
             if (userExists != null)

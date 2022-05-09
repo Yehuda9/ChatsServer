@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿/*using System.ComponentModel.DataAnnotations;
 
 [Serializable]
 public class Contact
@@ -22,7 +22,7 @@ public class Contact
     public DateTime lastdate { get; set; }
     public void addMessage(string content)
     {
-        messages.Add(new Message(messages.Capacity + 1, content));
+        messages.Add(new Message(messages.Capacity + 1, content,));
     }
     public void editMessage(int id, string content)
     {
@@ -49,3 +49,4 @@ public class Contact
     }
 }
 
+*/

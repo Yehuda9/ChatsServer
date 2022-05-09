@@ -1,13 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("users")]
 public class User
 {
     [Key]
+    [Column("id")]
     public string idName { get; set; }
     [Required]
     public string password { get; set; }
     public string nickName { get; set; }
-    public List<Contact> contacts { get; set; } 
+    public List<string> contactsId { get; set; }
+
     public User()
     {
     }
@@ -16,11 +20,7 @@ public class User
         this.idName = id;
         this.password = password;   
         this.nickName = name;
-        this.contacts = new List<Contact>();
-    }
-   public Contact? GetContact(string id)
-    {
-        return this.contacts.Find(x => x.id == id); 
+        this.contactsId = new List<string>();
     }
 }
 
