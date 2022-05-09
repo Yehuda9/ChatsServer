@@ -1,47 +1,37 @@
 ﻿public class ContactsService : ContactsIService
 {
-    public void addMessage(Contact contact, string content)
-    {
-        contact.addMessage(content);
-    }
+    private static List<Contact> contactsList = new();
 
-    public void create(User user, Contact contact)
+    public void create( Contact contact)
     {
-        if (!user.contacts.Contains(contact))
+        if (!contactsList.Contains(contact))
         {
-            user.contacts.Add(contact);
+            contactsList.Add(contact);
         }
     }
 
-    public void delete(User user, string id)
+    public void delete( string id)
     {
-        Contact c = user.contacts.Find(x => x.id == id);
-        if (c != null) { user.contacts.Remove(c); }
+        Contact? c = contactsList.Find(x => x.id == id);
+        if (c != null) { contactsList.Remove(c); }
     }
 
-    public void editMessage(Contact contact, int id, string content)
+   
+
+    public Contact? get( string id)
     {
-        contact.editMessage(id, content);
+        return contactsList.Find(x => x.id == id);
     }
 
-    public Contact get(User user, string id)
+    public IReadOnlyCollection<Contact> getAll()
     {
-        return user.contacts.Find(x => x.id == id);
+        return contactsList.AsReadOnly();
     }
 
-    public IReadOnlyCollection<Contact> getAll(User user)
-    {
-        return user.contacts.AsReadOnly();
-    }
 
-    public Contact getContact(User user,string id)
+    public void update(Contact contact)
     {
-        return user.GetContact(id);
-    }
-
-    public void update(User user, Contact contact)
-    {
-        Contact c = user.contacts.Find(x => x.id == contact.id);
+        Contact? c = contactsList.Find(x => x.id == contact.id);
 
         if (c != null)
         {
