@@ -1,6 +1,6 @@
 ﻿public class UsersService : UsersIService
 {
-    private static List<User> usersList = new() {new("y","1","y") };
+    private static List<User> usersList = new() {/*new("y","1","y")*/ };
 
     public bool checkPassword(User user, string password)
     {
@@ -13,6 +13,8 @@
 
     public void create(string id, string name, string password)
     {
+        //User? user = usersList.Find(x=>x.idName==id);
+
         User? user = new(id, password, name);
         if (!usersList.Contains(user))
         {

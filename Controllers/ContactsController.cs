@@ -21,7 +21,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().contacts);
+            return JsonSerializer.Serialize(getUser().contactsService.getAll());
         }
         catch (Exception ex)
         {
@@ -33,8 +33,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-
-            getUser().contacts.Add(new Contact(id, name, server));
+            getUser().contactsService.create(new Contact(id, name, server));
             return Ok();
         }
         catch (Exception ex)
@@ -49,7 +48,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().getContact(id));
+            return JsonSerializer.Serialize(getUser().contactsService.get(id));
         }
         catch (Exception ex)
         {
@@ -62,10 +61,11 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            Contact? contact = getUser().getContact(id);
+            getUser().contactsService.update(new Contact(id, name, server));
+            /*Contact? contact = getUser().contactsIService.get(id);
             if (contact == null) { return BadRequest(); }
             contact.name = name;
-            contact.server = server;
+            contact.server = server;*/
             return Ok();
         }
         catch (Exception ex)
@@ -79,9 +79,10 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            Contact? contact = getUser().getContact(id);
+            getUser().contactsService.delete(id);
+            /*Contact? contact = getUser().getContact(id);
             if(contact == null) { return BadRequest(); }
-            getUser().contacts.Remove(contact);
+            getUser().contacts.Remove(contact);*/
             return Ok();
         }
         catch (Exception ex)
@@ -95,7 +96,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().getContact(id).messages);
+            return JsonSerializer.Serialize(getUser().contactsService.get(id).messages);
         }
         catch (Exception ex)
         {
@@ -108,7 +109,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().getContact(id).addMessage(content);
+            getUser().contactsService.get(id).addMessage(content);
             return Ok();
 
         }
@@ -123,7 +124,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(getUser().getContact(id).messages.Find(x=>x.id==id2));
+            return JsonSerializer.Serialize(getUser().contactsService.get(id).messages.Find(x=>x.id==id2));
         }
         catch (Exception ex)
         {
@@ -136,7 +137,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().getContact(id).editMessage(id2 , content); 
+            getUser().contactsService.get(id).editMessage(id2 , content); 
             return Ok();
         }
         catch (Exception ex)
@@ -150,7 +151,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            getUser().getContact(id).deleteMessage(id2 , content);  
+            getUser().contactsService.get(id).deleteMessage(id2 , content);  
             return Ok();
         }
         catch (Exception ex)
