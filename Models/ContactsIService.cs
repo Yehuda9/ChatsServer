@@ -1,11 +1,10 @@
 ﻿public interface ContactsIService
 {
-    IReadOnlyCollection<ContactModel> getAll(string userId);
-    ContactModel get(string userId, string contactId);
-    void delete(string userId, string contactId);
-    void update(string userId, string contactId);
-    void create(string userId, string contactId);
-    /*void addMessage(Contact contact, string content);
-    void editMessage(Contact contact, int id, string content);
-*/
+    IReadOnlyCollection<Contact> getAll(string user);
+    Contact get(string user,string id);
+    void delete(string user,String id);
+    void update(string user,Contact contact);
+    void create(string user,Contact contact);
+    void addMessage(string contact,string content);
+    void editMessage(string contact,int id, string content);
 }

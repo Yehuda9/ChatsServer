@@ -8,15 +8,14 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    //private readonly ContactsIService? contactsIService;
-    //private readonly UsersIService? usersIService;
-    private readonly DataContext? db;
+    private readonly ContactsIService? contactsIService;
+    private readonly UsersIService? usersIService;
 
 
-    public ContactsController()
+    public ContactsController(ContactsIService cis, UsersIService uis)
     {
-        //usersIService = uis;
-        db = new DataContext();
+        contactsIService = cis;
+        usersIService = uis;
     }
 
     [HttpGet]
@@ -24,8 +23,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            User? user = db.users.Find(getUser());
-            return JsonSerializer.Serialize(db.contacts.Where(c => user.contactsId.Contains(c.id)));
+            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
         }
         catch (Exception ex)
         {
@@ -37,9 +35,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            db.users.Find(getUser()).contactsId.Add(id);
-            db.Add(new ContactModel(id, name, server));
-            db.SaveChanges();
+            
+            contactsIService.create(getUser(), new Contact(id, name, server));
             return Ok();
         }
         catch (Exception ex)
@@ -54,7 +51,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(db.contacts.Find(id));
+            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
 
         }
         catch (Exception ex)
@@ -68,8 +65,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            db.contacts.Update(new ContactModel(id, name, server));
-            db.SaveChanges();
+            contactsIService.update(getUser(), new Contact(id, name, server));
             return Ok();
 
         }
@@ -84,8 +80,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            db.contacts.Remove(db.contacts.Find(id));
-            db.SaveChanges();
+            contactsIService.delete(getUser(), id);
             return Ok();
 
         }
@@ -100,7 +95,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(db.messages.Where(x => (x.fromId == getUser() && x.toId == id) || (x.toId == getUser() && x.fromId == id)));
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
         }
         catch (Exception ex)
         {
@@ -109,12 +104,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id, string content)
+    public IActionResult createContactMessage(string id,string content)
     {
         try
-        {
-            db.messages.Add(new Message(content,id,getUser()));
-            db.SaveChanges();   
+        {          
+            //contactsIService.addMessage(contactsIService.get(id), content);
             return Ok();
 
         }
@@ -129,7 +123,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(db.messages.);
+            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
         }
         catch (Exception ex)
         {
@@ -138,11 +132,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2, string content)
+    public ActionResult<string> editContactMessage(string id, int id2,string content)
     {
         try
         {
-            contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            //contactsIService.editMessage(getUser().GetContact(id), id2, content);
             return Ok();
         }
         catch (Exception ex)
@@ -150,11 +144,11 @@ public class ContactsController : ControllerBase
             return Unauthorized();
         }
     }
-    private string getUser()
+    private string? getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User? user = db.users.Find(name);
+        User user = usersIService.get(name);
         if (user == null) { return null; }
         return user.idName;
     }

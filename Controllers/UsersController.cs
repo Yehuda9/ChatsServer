@@ -13,26 +13,23 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly DbContext userContext;
+        //private readonly DbContext userContext;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService)
+        public UsersController(IConfiguration configuration,UsersIService usersIService)
         {
             usersService = usersIService;
             _configuration = configuration;
-            userContext = new DataContext();
         }
 
         [HttpPost]
         [Route("login")]
-        public IActionResult login(string name, string password)
+        public  IActionResult login(string name,string password)
         {
             var user = usersService.get(name);
-            userContext.Add(new User(name, password, name));
-            userContext.SaveChanges();
 
-            if (user != null && usersService.checkPassword(user, password))
+            if (user != null &&  usersService.checkPassword(user, password))
             {
 
                 var authClaims = new List<Claim>
@@ -51,21 +48,20 @@ namespace JWTAuthentication.NET6._0.Controllers
             }
             return Unauthorized();
         }
-        /* [Authorize]
-         [HttpPost]
-         [Route("logout")]
-         public  IActionResult logout()
-         {
+       /* [Authorize]
+        [HttpPost]
+        [Route("logout")]
+        public  IActionResult logout()
+        {
 
-         }*/
+        }*/
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register(string name, string password)
+        public IActionResult register(string name,string password)
         {
-            var userExists = new DataContext().users.Where(x => x.idName == name);
 
-            //var userExists =  usersService.get(name);
+            var userExists =  usersService.get(name);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
             usersService.create(name, name, password);

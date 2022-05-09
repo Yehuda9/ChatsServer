@@ -1,7 +1,7 @@
 ﻿public class UsersService : UsersIService
 {
     private static List<User> usersList = new() { new("y", "1", "y") };
-
+    private readonly DataContext context=new();
     public bool checkPassword(User user, string password)
     {
         if (user != null && user.password == password)
@@ -13,6 +13,8 @@
 
     public void create(string id, string name, string password)
     {
+        context.Add(new User(id, name, password));
+        context.SaveChanges();
         //User? user = usersList.Find(x=>x.idName==id);
 
         User? user = new(id, password, name);
@@ -33,6 +35,7 @@
 
     public User get(string id)
     {
+        //return context.users.Find(id);
         return usersList.Find(x => x.idName == id);
     }
 

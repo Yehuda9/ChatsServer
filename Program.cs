@@ -15,9 +15,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddScoped<ContactsIService, ContactsService>();
-builder.Services.AddScoped<UsersIService, UsersService>();
-builder.Services.AddDbContext<DataContext>();
+builder.Services.AddScoped<ContactsIService, ContactsServiceM>();
+builder.Services.AddScoped<UsersIService, UsersServiceM>();
+//builder.Services.AddDbContext<User>(options => options.U(Configuration.GetConnectionString("DataContext")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
