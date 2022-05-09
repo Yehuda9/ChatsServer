@@ -13,7 +13,7 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly DbContext userContext;
+        //private readonly DbContext userContext;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
 
@@ -21,7 +21,6 @@ namespace JWTAuthentication.NET6._0.Controllers
         {
             usersService = usersIService;
             _configuration = configuration;
-            userContext = new UserContext();
         }
 
         [HttpPost]
@@ -29,8 +28,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         public  IActionResult login(string name,string password)
         {
             var user = usersService.get(name);
-            userContext.Add(new User(name,password,name));
-            userContext.SaveChanges();
+            
 
             if (user != null &&  usersService.checkPassword(user, password))
             {
@@ -63,7 +61,6 @@ namespace JWTAuthentication.NET6._0.Controllers
         [Route("register")]
         public IActionResult register(string name,string password)
         {
-            //var userExists = userContext.users.;
 
             var userExists =  usersService.get(name);
             if (userExists != null)
