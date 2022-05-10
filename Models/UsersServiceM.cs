@@ -51,13 +51,13 @@
         var t2=new List<User>();
         foreach (var x in t1)
         {
-            if (x.users[0].userId != id)
+            if (x.user1Id != id)
             {
-                t2.Add(x.users[0]);
+                t2.Add(context.users.Find(x.user1Id));
             }
-            if (x.users[1].userId != id)
+            if (x.user2Id != id)
             {
-                t2.Add(x.users[1]);
+                t2.Add(context.users.Find(x.user2Id));
             }
         }
         return t2;
