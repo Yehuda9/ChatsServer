@@ -58,13 +58,13 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register(string name,string password)
+        public IActionResult register(string name,string nickName,string password,string profileImage)
         {
 
             var userExists =  usersService.get(name,"");
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name,"","",password);
+            usersService.create(name,nickName,"",password);
             return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 
