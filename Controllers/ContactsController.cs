@@ -8,9 +8,8 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    //private readonly ContactsIService? contactsIService;
     private readonly UsersIService? usersIService;
-
+    private readonly MessagesIService? messagesIService;
 
     public ContactsController(UsersIService uis)
     {
@@ -65,7 +64,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            //contactsIService.update(getUser(), new User(id, name, server));
+            usersIService.update(usersIService.getContact(getUser(),id).userId,name,server);
             return Ok();
 
         }
@@ -95,8 +94,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
+            return JsonSerializer.Serialize(messagesIService.getMessages(getUser(),id));
             return Ok();
-            //return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {
@@ -109,7 +108,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            //contactsIService.addMessage(contactsIService.get(id), content);
+            messagesIService.addMessage(getUser(),id,content);
             return Ok();
 
         }
@@ -120,12 +119,12 @@ public class ContactsController : ControllerBase
     }
     [HttpGet]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> getContactMessage(string id, int id2)
+    public ActionResult<string> getContactMessage(string id, string id2)
     {
         try
         {
+            messagesIService.getMessage(getUser(), id, id2);
             return Ok();
-            //return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {
@@ -134,11 +133,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2, string content)
+    public ActionResult<string> editContactMessage(string id, string id2, string content)
     {
         try
         {
-            //contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            messagesIService.updateMessage(getUser(), id, id2, content);
             return Ok();
         }
         catch (Exception ex)

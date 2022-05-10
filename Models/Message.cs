@@ -15,5 +15,13 @@ public class Message
     {
 
     }
+    public Message(string from,string to,string content)
+    {
+        fromId = from;
+        toId = to;  
+        this.content = content;
+        created = DateTime.Now; 
+        sent = false;
+    }
 }
 
