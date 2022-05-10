@@ -18,10 +18,47 @@ namespace Chats.Migrations
                 .HasAnnotation("ProductVersion", "6.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("user1Id")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("user2Id")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("chats");
+                });
+
+            modelBuilder.Entity("ChatUser", b =>
+                {
+                    b.Property<int>("userMessagesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("usersuserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("userMessagesId", "usersuserId");
+
+                    b.HasIndex("usersuserId");
+
+                    b.ToTable("ChatUser");
+                });
+
             modelBuilder.Entity("Message", b =>
                 {
                     b.Property<string>("MessageId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("ChatId")
+                        .HasColumnType("int");
 
                     b.Property<string>("content")
                         .HasColumnType("longtext");
@@ -42,16 +79,14 @@ namespace Chats.Migrations
 
                     b.HasKey("MessageId");
 
-                    b.ToTable("messages");
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("User", b =>
                 {
                     b.Property<string>("userId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("MessageId")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("name")
@@ -72,91 +107,34 @@ namespace Chats.Migrations
 
                     b.HasKey("userId");
 
-                    b.HasIndex("MessageId");
-
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("UserMessage", b =>
+            modelBuilder.Entity("ChatUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("fromId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("messageId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("toId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("messageId");
-
-                    b.ToTable("userMessages");
-                });
-
-            modelBuilder.Entity("UserUserMessage", b =>
-                {
-                    b.Property<string>("contactsuserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("userMessagesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("contactsuserId", "userMessagesId");
-
-                    b.HasIndex("userMessagesId");
-
-                    b.ToTable("UserUserMessage");
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.HasOne("Message", "message")
-                        .WithMany()
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("message");
-                });
-
-            modelBuilder.Entity("UserMessage", b =>
-                {
-                    b.HasOne("Message", "message")
-                        .WithMany("userMessages")
-                        .HasForeignKey("messageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("message");
-                });
-
-            modelBuilder.Entity("UserUserMessage", b =>
-                {
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("contactsuserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UserMessage", null)
+                    b.HasOne("Chat", null)
                         .WithMany()
                         .HasForeignKey("userMessagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("User", null)
+                        .WithMany()
+                        .HasForeignKey("usersuserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Message", b =>
                 {
-                    b.Navigation("userMessages");
+                    b.HasOne("Chat", null)
+                        .WithMany("messages")
+                        .HasForeignKey("ChatId");
+                });
+
+            modelBuilder.Entity("Chat", b =>
+                {
+                    b.Navigation("messages");
                 });
 #pragma warning restore 612, 618
         }

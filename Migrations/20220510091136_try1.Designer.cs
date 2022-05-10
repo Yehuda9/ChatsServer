@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chats.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220510083029_try2")]
-    partial class try2
+    [Migration("20220510091136_try1")]
+    partial class try1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,10 +20,47 @@ namespace Chats.Migrations
                 .HasAnnotation("ProductVersion", "6.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("user1Id")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("user2Id")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("userMessages");
+                });
+
+            modelBuilder.Entity("ChatUser", b =>
+                {
+                    b.Property<int>("userMessagesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("usersuserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("userMessagesId", "usersuserId");
+
+                    b.HasIndex("usersuserId");
+
+                    b.ToTable("ChatUser");
+                });
+
             modelBuilder.Entity("Message", b =>
                 {
                     b.Property<string>("MessageId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("ChatId")
+                        .HasColumnType("int");
 
                     b.Property<string>("content")
                         .HasColumnType("longtext");
@@ -43,6 +80,8 @@ namespace Chats.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("MessageId");
+
+                    b.HasIndex("ChatId");
 
                     b.ToTable("messages");
                 });
@@ -79,44 +118,26 @@ namespace Chats.Migrations
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("UserMessage", b =>
+            modelBuilder.Entity("ChatUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("Chat", null)
+                        .WithMany()
+                        .HasForeignKey("userMessagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("fromId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("messageId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("toId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("messageId");
-
-                    b.ToTable("userMessages");
+                    b.HasOne("User", null)
+                        .WithMany()
+                        .HasForeignKey("usersuserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("UserUserMessage", b =>
+            modelBuilder.Entity("Message", b =>
                 {
-                    b.Property<string>("contactsuserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("userMessagesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("contactsuserId", "userMessagesId");
-
-                    b.HasIndex("userMessagesId");
-
-                    b.ToTable("UserUserMessage");
+                    b.HasOne("Chat", null)
+                        .WithMany("messages")
+                        .HasForeignKey("ChatId");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -130,35 +151,9 @@ namespace Chats.Migrations
                     b.Navigation("message");
                 });
 
-            modelBuilder.Entity("UserMessage", b =>
+            modelBuilder.Entity("Chat", b =>
                 {
-                    b.HasOne("Message", "message")
-                        .WithMany("userMessages")
-                        .HasForeignKey("messageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("message");
-                });
-
-            modelBuilder.Entity("UserUserMessage", b =>
-                {
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("contactsuserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UserMessage", null)
-                        .WithMany()
-                        .HasForeignKey("userMessagesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Message", b =>
-                {
-                    b.Navigation("userMessages");
+                    b.Navigation("messages");
                 });
 #pragma warning restore 612, 618
         }

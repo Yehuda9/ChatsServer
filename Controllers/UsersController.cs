@@ -64,7 +64,7 @@ namespace JWTAuthentication.NET6._0.Controllers
             var userExists =  usersService.get(name);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name, name, password);
+            usersService.create(name, "", password);
             return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 

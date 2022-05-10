@@ -5,8 +5,7 @@
 public class DataContext : DbContext
 {
     public DbSet<User> users { get; set; }
-    public DbSet<Message> messages { get; set; }
-    public DbSet<UserMessage> userMessages { get; set; }
+    public DbSet<Chat> chats { get; set; }
 
     private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=haim";
 

@@ -11,7 +11,7 @@ public class ContactsServiceM : ContactsIService
 
     public void create(string user, User contact)
     {
-        contact.userMessages.Add(new UserMessage());
+        contact.userMessages.Add(new Chat());
         context.Add(contact);
         /*if (context.users.Find(user) != null)
         {

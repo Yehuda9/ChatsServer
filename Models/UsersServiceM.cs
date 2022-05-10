@@ -10,7 +10,7 @@
         return false;
     }
 
-    public void create(string id, string name, string server, string password = "")
+    public void create(string name, string server, string password = "")
     {
         context.Add(new User(name,server,password));
         context.SaveChanges();
@@ -34,7 +34,7 @@
 
     public User? get(string id)
     {
-        return context.users.Find(id);
+        return context.users.Find(id+",");
     }
 
     public void update(string id, string name, string password)
