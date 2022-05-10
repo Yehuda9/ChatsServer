@@ -9,11 +9,10 @@ public class User
     public string password { get; set; }
     public string nickName { get; set; }
     public string server { get; set; }
-    //public List<string> contacts { get; set; }
     public List<Chat> userMessages { get; set; }
-
-    //public Message message { get; set; }
-    public User() { }
+    public User() { 
+        this.userMessages = new List<Chat>();
+    }
     public User(string name, string server, string password = "")
     {
         this.userId = name + "," + server;
@@ -21,6 +20,7 @@ public class User
         this.password = password;
         this.nickName = name;
         this.server = server;
+        this.userMessages = new List<Chat>();
     }
 }
 

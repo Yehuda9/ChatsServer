@@ -8,13 +8,12 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly ContactsIService? contactsIService;
+    //private readonly ContactsIService? contactsIService;
     private readonly UsersIService? usersIService;
 
 
-    public ContactsController(ContactsIService cis, UsersIService uis)
+    public ContactsController(UsersIService uis)
     {
-        contactsIService = cis;
         usersIService = uis;
     }
 
@@ -23,7 +22,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
+            return JsonSerializer.Serialize(usersIService.getAllContacts(getUser()));
         }
         catch (Exception ex)
         {
@@ -35,12 +34,9 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            User user = contactsIService.get(getUser(),id);
-            if(user == null)
-            {
-                usersIService.create(id, name,server);
-            }
-            contactsIService.create(getUser(), user);
+
+            usersIService.create(id, server);
+            usersIService.addContact(getUser(), id + "," + server);
             return Ok();
         }
         catch (Exception ex)
@@ -55,7 +51,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
+            return JsonSerializer.Serialize(usersIService.getContact(getUser(), id));
 
         }
         catch (Exception ex)
@@ -84,7 +80,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.delete(getUser(), id);
+            usersIService.removeContact(getUser(), id);
             return Ok();
 
         }
@@ -99,7 +95,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
+            return Ok();
+            //return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {
@@ -108,10 +105,10 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id,string content)
+    public IActionResult createContactMessage(string id, string content)
     {
         try
-        {          
+        {
             //contactsIService.addMessage(contactsIService.get(id), content);
             return Ok();
 
@@ -127,7 +124,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
+            return Ok();
+            //return JsonSerializer.Serialize((contactsIService.get(getUser(), id)));
         }
         catch (Exception ex)
         {
@@ -136,7 +134,7 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2,string content)
+    public ActionResult<string> editContactMessage(string id, int id2, string content)
     {
         try
         {
@@ -154,7 +152,7 @@ public class ContactsController : ControllerBase
         if (name == null) { return null; }
         User user = usersIService.get(name);
         if (user == null) { return null; }
-        return user.name;
+        return user.name + ",";
     }
 }
 

@@ -11,6 +11,9 @@ public class Message
     public bool sent { get; set; }
     public string fromId { get; set; }
     public string toId { get; set; }
+    public Message()
+    {
 
+    }
 }
 
