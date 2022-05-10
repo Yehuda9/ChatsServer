@@ -17,12 +17,12 @@
         return false;
     }
 
-    public void create(string name, string server, string password = "")
+    public void create(string fullName,string nickName, string server, string password = "")
     {
-        var user = new User(name, server, password);
+        var user = new User(fullName, server,nickName, password);
         if (!context.users.Contains(user))
         {
-            context.Add(new User(name, server, password));
+            context.Add(user);
             context.SaveChanges();
         }
     }
@@ -39,7 +39,7 @@
         }
     }
 
-    public User? get(string id, string server = "")
+    public User? get(string id, string server)
     {
         return context.users.Find(id + "," + server);
     }

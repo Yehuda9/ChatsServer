@@ -10,9 +10,10 @@ public class ContactsController : ControllerBase
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
 
-    public ContactsController(UsersIService uis)
+    public ContactsController(UsersIService uis,MessagesIService mis)
     {
         usersIService = uis;
+        messagesIService = mis;
     }
 
     [HttpGet]
@@ -31,10 +32,10 @@ public class ContactsController : ControllerBase
     public IActionResult createContact(string id, string name, string server)
     {
         try
-        {
-
-            usersIService.create(id, server);
-            usersIService.addContact(getUser(), id + "," + server);
+        {    
+            usersIService.create(id,name, server);
+            var u = usersIService.get(id,server);
+            usersIService.addContact(getUser(), u.userId);
             return Ok();
         }
         catch (Exception ex)
@@ -148,9 +149,9 @@ public class ContactsController : ControllerBase
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User user = usersIService.get(name);
+        User user = usersIService.get(name,"");
         if (user == null) { return null; }
-        return user.name + ",";
+        return user.userId;
     }
 }
 

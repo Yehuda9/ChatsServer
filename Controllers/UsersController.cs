@@ -27,7 +27,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         [Route("login")]
         public  IActionResult login(string name,string password)
         {
-            var user = usersService.get(name);
+            var user = usersService.get(name,"");
 
             if (user != null &&  usersService.checkPassword(user, password))
             {
@@ -61,10 +61,10 @@ namespace JWTAuthentication.NET6._0.Controllers
         public IActionResult register(string name,string password)
         {
 
-            var userExists =  usersService.get(name);
+            var userExists =  usersService.get(name,"");
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name, "", password);
+            usersService.create(name,"","",password);
             return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 
