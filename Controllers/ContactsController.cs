@@ -40,7 +40,7 @@ public class ContactsController : ControllerBase
             {
                 usersIService.create(id, name,server);
             }
-            contactsIService.create(getUser(), id);
+            contactsIService.create(getUser(), user);
             return Ok();
         }
         catch (Exception ex)

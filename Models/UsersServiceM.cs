@@ -12,7 +12,8 @@
 
     public void create(string id, string name, string server, string password = "")
     {
-
+        context.Add(new User(name,server,password));
+        context.SaveChanges();
         /*User? user = new(name,server,password);
         if (!context.users.Contains(user))
         {

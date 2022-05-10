@@ -12,7 +12,7 @@ public class User
     //public List<string> contacts { get; set; }
     public List<UserMessage> userMessages { get; set; }
 
-    /*public Message message { get; set; }
+    public Message message { get; set; }
     public User() { }
     public User(string name, string server, string password = "")
     {
@@ -20,8 +20,7 @@ public class User
         this.name = name;
         this.password = password;
         this.nickName = name;
-        this.contacts = new List<string>();
         this.server = server;
-    }*/
+    }
 }
 

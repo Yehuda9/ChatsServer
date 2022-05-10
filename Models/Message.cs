@@ -11,8 +11,8 @@ public class Message
     public bool sent { get; set; }
     public string fromId { get; set; }
     public string toId { get; set; }
-    public User from { get; set; }
-    public User to { get; set; }
+    //public User from { get; set; }
+    //public User to { get; set; }
 
     public List<UserMessage> userMessages { get; set; }
     /*public Message() { }

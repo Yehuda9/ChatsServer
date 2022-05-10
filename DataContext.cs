@@ -34,12 +34,6 @@ public class DataContext : DbContext
         /*modelBuilder.Entity<UserMessage>()
             .HasOne(u => u.message)
             .WithMany(um => um.userMessages)
-            .HasForeignKey(ui => ui.messageId);
-
-
-        modelBuilder.Entity<UserMessage>()
-            .HasOne(u => u.contacts)
-            .WithMany()
             .HasForeignKey(ui => ui.messageId);*/
     }
 

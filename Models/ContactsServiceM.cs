@@ -9,14 +9,15 @@ public class ContactsServiceM : ContactsIService
 
     }
 
-    public void create(string user, string contact)
+    public void create(string user, User contact)
     {
-
-        if (context.users.Find(user) != null)
+        contact.userMessages.Add(new UserMessage());
+        context.Add(contact);
+        /*if (context.users.Find(user) != null)
         {
             User? u = context.users.Where(p => p.userId == user && p.server == "").Include("contacts").FirstOrDefault();
             //u.contacts.Add(contact);
-        }
+        }*/
     }
 
     public void delete(string user, string id)
