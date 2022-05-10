@@ -9,8 +9,10 @@ public class User
     public string password { get; set; }
     public string nickName { get; set; }
     public string server { get; set; }
-    public List<string> contacts { get; set; }
-    public Message message { get; set; }
+    //public List<string> contacts { get; set; }
+    public List<UserMessage> userMessages { get; set; }
+
+    /*public Message message { get; set; }
     public User() { }
     public User(string name, string server, string password = "")
     {
@@ -20,6 +22,6 @@ public class User
         this.nickName = name;
         this.contacts = new List<string>();
         this.server = server;
-    }
+    }*/
 }
 

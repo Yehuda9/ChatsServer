@@ -13,12 +13,12 @@
     public void create(string id, string name, string server, string password = "")
     {
 
-        User? user = new(name,server,password);
+        /*User? user = new(name,server,password);
         if (!context.users.Contains(user))
         {
             context.users.Add(user);
             context.SaveChanges();
-        }
+        }*/
     }
 
 

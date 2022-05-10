@@ -69,7 +69,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.update(getUser(), new User(id, name, server));
+            //contactsIService.update(getUser(), new User(id, name, server));
             return Ok();
 
         }

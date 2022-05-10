@@ -11,7 +11,11 @@ public class Message
     public bool sent { get; set; }
     public string fromId { get; set; }
     public string toId { get; set; }
-    public Message() { }
+    public User from { get; set; }
+    public User to { get; set; }
+
+    public List<UserMessage> userMessages { get; set; }
+    /*public Message() { }
     public Message(string content, string from, string to)
     {
         this.content = content;
@@ -20,6 +24,6 @@ public class Message
         this.fromId = from;
         this.toId = to;
         this.MessageId = fromId + "," + toId;
-    }
+    }*/
 }
 

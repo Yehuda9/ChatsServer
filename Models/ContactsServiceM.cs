@@ -15,7 +15,7 @@ public class ContactsServiceM : ContactsIService
         if (context.users.Find(user) != null)
         {
             User? u = context.users.Where(p => p.userId == user && p.server == "").Include("contacts").FirstOrDefault();
-            u.contacts.Add(contact);
+            //u.contacts.Add(contact);
         }
     }
 
@@ -40,7 +40,8 @@ public class ContactsServiceM : ContactsIService
     public List<User> getAll(string user)
     {
         User? u = context.users.Where(p => p.userId == user && p.server == "").Include("contacts").FirstOrDefault();
-        return context.users.Where(p=>u.contacts.Contains(p.userId)).ToList();
+        return null;
+        //return context.users.Where(p=>u.contacts.Contains(p.userId)).ToList();
     }
 
     public User getContact(string user, string id)

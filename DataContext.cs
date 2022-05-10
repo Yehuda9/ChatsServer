@@ -6,6 +6,8 @@ public class DataContext : DbContext
 {
     public DbSet<User> users { get; set; }
     public DbSet<Message> messages { get; set; }
+    public DbSet<UserMessage> userMessages { get; set; }
+
     private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=haim";
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -25,10 +27,20 @@ public class DataContext : DbContext
         //modelBuilder.Entity<User>().HasMany(u => u.message);
         //modelBuilder.Entity<User>().HasMany<Contact>().WithMany(u=>u.userId).HasForeignKey(x => x.ContactId);
 
-        modelBuilder.Entity<Message>().HasKey(x => new { x.fromId, x.toId });
+        /*modelBuilder.Entity<Message>().HasKey(x => new { x.fromId, x.toId });
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Message>().ToTable("contact");
-        modelBuilder.Entity<Message>().ToTable("message");
+        modelBuilder.Entity<Message>().ToTable("message");*/
+        /*modelBuilder.Entity<UserMessage>()
+            .HasOne(u => u.message)
+            .WithMany(um => um.userMessages)
+            .HasForeignKey(ui => ui.messageId);
+
+
+        modelBuilder.Entity<UserMessage>()
+            .HasOne(u => u.contacts)
+            .WithMany()
+            .HasForeignKey(ui => ui.messageId);*/
     }
 
 }
