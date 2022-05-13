@@ -4,7 +4,7 @@
 
 namespace Chats.Migrations
 {
-    public partial class b : Migration
+    public partial class sqlite6 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

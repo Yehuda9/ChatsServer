@@ -10,44 +10,41 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chats.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220510091136_try1")]
-    partial class try1
+    [Migration("20220513204310_sqlite5")]
+    partial class sqlite5
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
 
             modelBuilder.Entity("Chat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("id")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("user1Id")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("user2Id")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
-                    b.ToTable("userMessages");
+                    b.ToTable("chats");
                 });
 
             modelBuilder.Entity("ChatUser", b =>
                 {
-                    b.Property<int>("userMessagesId")
-                        .HasColumnType("int");
+                    b.Property<string>("userMessagesid")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("usersuserId")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("userMessagesId", "usersuserId");
+                    b.HasKey("userMessagesid", "usersuserId");
 
                     b.HasIndex("usersuserId");
 
@@ -57,31 +54,33 @@ namespace Chats.Migrations
             modelBuilder.Entity("Message", b =>
                 {
                     b.Property<string>("MessageId")
-                        .HasColumnType("varchar(255)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("ChatId")
-                        .HasColumnType("int");
+                    b.Property<string>("chatId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("content")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("created")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("fromId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("sent")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("toId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("MessageId");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("chatId");
 
                     b.ToTable("messages");
                 });
@@ -89,31 +88,32 @@ namespace Chats.Migrations
             modelBuilder.Entity("User", b =>
                 {
                     b.Property<string>("userId")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("MessageId")
+                    b.Property<string>("fullName")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("name")
+                    b.Property<string>("last")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("lastDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("nickName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("password")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("server")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("userId");
-
-                    b.HasIndex("MessageId");
 
                     b.ToTable("users");
                 });
@@ -122,7 +122,7 @@ namespace Chats.Migrations
                 {
                     b.HasOne("Chat", null)
                         .WithMany()
-                        .HasForeignKey("userMessagesId")
+                        .HasForeignKey("userMessagesid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -137,18 +137,9 @@ namespace Chats.Migrations
                 {
                     b.HasOne("Chat", null)
                         .WithMany("messages")
-                        .HasForeignKey("ChatId");
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.HasOne("Message", "message")
-                        .WithMany()
-                        .HasForeignKey("MessageId")
+                        .HasForeignKey("chatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("message");
                 });
 
             modelBuilder.Entity("Chat", b =>

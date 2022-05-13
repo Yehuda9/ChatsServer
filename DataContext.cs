@@ -13,7 +13,12 @@ public class DataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseMySql(connectionString, MariaDbServerVersion.AutoDetect(connectionString));
+        var folder = Environment.SpecialFolder.LocalApplicationData;
+        var path = Environment.GetFolderPath(folder);
+        var DbPath = Path.Join(path, "mySqliteDB.db");
+        DbPath = "C:\\Users\\yehud\\Desktop\\ChatsServer\\mySqliteDB.db";
+        optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        //optionsBuilder.UseMySql(connectionString, MariaDbServerVersion.AutoDetect(connectionString));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
