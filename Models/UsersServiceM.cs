@@ -10,7 +10,7 @@
 
     public bool checkPassword(User user, string password)
     {
-        if (user != null && user.password == password)
+        if (user != null && user.chackPassword(password))
         {
             return true;
         }

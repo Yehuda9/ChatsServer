@@ -6,6 +6,8 @@ public class DataContext : DbContext
 {
     public DbSet<User> users { get; set; }
     public DbSet<Chat> chats { get; set; }
+    public DbSet<Message> messages { get; set; }
+
 
     private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=haim";
 
@@ -16,6 +18,7 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Message>().Property(e => e.MessageId).ValueGeneratedOnAdd();
         // Configuring the Name property as the primary
         // key of the Items table
         /*modelBuilder.Entity<User>(entity =>

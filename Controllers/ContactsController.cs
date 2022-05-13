@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-[Authorize]
+//[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ContactsController : ControllerBase
@@ -149,7 +149,7 @@ public class ContactsController : ControllerBase
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User user = usersIService.get(name,"");
+        User user = usersIService.get(name,"me");
         if (user == null) { return null; }
         return user.userId;
     }

@@ -10,7 +10,7 @@ public class User
     public string userId { get; set; }
     [JsonProperty(PropertyName = "id")]
     public string fullName { get; set; }
-    /*[IgnoreDataMember]*/
+    //[JsonIgnore]
     public string password { get; set; }
     [JsonProperty(PropertyName = "name")]
     public string nickName { get; set; }
@@ -33,6 +33,11 @@ public class User
         this.userMessages = new List<Chat>();
         last = "";
         lastDate = DateTime.Now; 
+    }
+    public bool chackPassword(string pass)
+    {
+        if (pass == null) return false;
+        return password.Equals(pass);
     }
 }
 
