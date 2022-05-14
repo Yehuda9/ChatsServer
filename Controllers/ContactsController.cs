@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-[Authorize]
+//[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly ContactsIService? contactsIService;
     private readonly UsersIService? usersIService;
+    private readonly MessagesIService? messagesIService;
 
-
-    public ContactsController(ContactsIService cis, UsersIService uis)
+    public ContactsController(UsersIService uis,MessagesIService mis)
     {
-        contactsIService = cis;
         usersIService = uis;
+        messagesIService = mis;
     }
 
     [HttpGet]
@@ -23,7 +21,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.getAll(getUser()));
+            return JsonSerializer.Serialize(usersIService.getAllContacts(getUser()));
         }
         catch (Exception ex)
         {
@@ -34,8 +32,10 @@ public class ContactsController : ControllerBase
     public IActionResult createContact(string id, string name, string server)
     {
         try
-        {
-            contactsIService.create(getUser(), new Contact(id, name, server));
+        {    
+            usersIService.create(id,name, server);
+            var u = usersIService.get(id,server);
+            usersIService.addContact(getUser(), u.userId);
             return Ok();
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(contactsIService.get(getUser(), id));
+            return JsonSerializer.Serialize(usersIService.getContact(getUser(), id));
 
         }
         catch (Exception ex)
@@ -64,7 +64,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.update(getUser(), new Contact(id, name, server));
+            usersIService.update(usersIService.getContact(getUser(),id).userId,name,server);
             return Ok();
 
         }
@@ -79,7 +79,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            contactsIService.delete(getUser(), id);
+            usersIService.removeContact(getUser(), id);
             return Ok();
 
         }
@@ -94,7 +94,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages));
+            return JsonSerializer.Serialize(messagesIService.getMessages(getUser(),id));
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -103,11 +104,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id,string content)
+    public IActionResult createContactMessage(string id, string content)
     {
         try
-        {          
-            contactsIService.addMessage(getUser().GetContact(id), content);
+        {
+            messagesIService.addMessage(getUser(),id,content);
             return Ok();
 
         }
@@ -118,11 +119,12 @@ public class ContactsController : ControllerBase
     }
     [HttpGet]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> getContactMessage(string id, int id2)
+    public ActionResult<string> getContactMessage(string id, string id2)
     {
         try
         {
-            return JsonSerializer.Serialize((contactsIService.get(getUser(), id).messages.Find(x => x.id == id2)));
+            messagesIService.getMessage(getUser(), id, id2);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -131,11 +133,11 @@ public class ContactsController : ControllerBase
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, int id2,string content)
+    public ActionResult<string> editContactMessage(string id, string id2, string content)
     {
         try
         {
-            contactsIService.editMessage(getUser().GetContact(id), id2, content);
+            messagesIService.updateMessage(getUser(), id, id2, content);
             return Ok();
         }
         catch (Exception ex)
@@ -143,13 +145,13 @@ public class ContactsController : ControllerBase
             return Unauthorized();
         }
     }
-    private User? getUser()
+    private string? getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User user = usersIService.get(name);
+        User user = usersIService.get(name,"me");
         if (user == null) { return null; }
-        return user;
+        return user.userId;
     }
 }
 

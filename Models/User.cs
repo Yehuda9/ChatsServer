@@ -1,23 +1,43 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 public class User
 {
     [Key]
-    public string idName { get; set; }
-    [Required]
+    [IgnoreDataMember]
+    public string userId { get; set; }
+    [JsonProperty(PropertyName = "id")]
+    public string fullName { get; set; }
+    //[JsonIgnore]
     public string password { get; set; }
+    [JsonProperty(PropertyName = "name")]
     public string nickName { get; set; }
-    public List<Contact> contacts { get; set; } 
-    public User(string id,string password,string name)
+    public string server { get; set; }
+    public string last { get; set; }
+    public DateTime lastDate { get; set; }
+
+    public List<Chat> userMessages { get; set; }
+    public User()
     {
-        this.idName = id;
-        this.password = password;   
-        this.nickName = name;
-        this.contacts = new List<Contact>();
+        this.userMessages = new List<Chat>();
     }
-   public Contact? GetContact(string id)
+    public User(string fullName, string server, string nickName, string password = "")
     {
-        return this.contacts.Find(x => x.id == id); 
+        this.userId = fullName + "," + server;
+        this.fullName = fullName;
+        this.password = password;
+        this.nickName = nickName;
+        this.server = server;
+        this.userMessages = new List<Chat>();
+        last = "";
+        lastDate = DateTime.Now; 
+    }
+    public bool chackPassword(string pass)
+    {
+        if (pass == null) return false;
+        return password.Equals(pass);
     }
 }
 

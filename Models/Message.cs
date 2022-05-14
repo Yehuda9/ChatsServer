@@ -1,17 +1,31 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 public class Message
 {
-
-    public int id { get; set; }
+    [Key]
+    //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public string MessageId { get; set; }
     public DateTime created { get; set; }
     public string? content { get; set; }
     public bool sent { get; set; }
-    public Message(int id,string content)
+    public string fromId { get; set; }
+    public string toId { get; set; }
+    public string chatId { get; set; }
+    public Message()
     {
-        this.id = id;
+
+    }
+    public Message(string from, string to, string content, string chatId)
+    {
+        fromId = from;
+        toId = to;
         this.content = content;
-        this.sent = false;
-        this.created = DateTime.Now;
+        created = DateTime.Now;
+        MessageId = from + "," + to + "," + created + "," + content;
+        sent = false;
+        this.chatId = chatId;
     }
 }
 
