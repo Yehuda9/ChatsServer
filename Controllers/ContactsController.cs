@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-//[Authorize]
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ContactsController : ControllerBase
 {
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
+    private readonly static string me = "me";
 
     public ContactsController(UsersIService uis,MessagesIService mis)
     {
@@ -149,7 +150,7 @@ public class ContactsController : ControllerBase
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User user = usersIService.get(name,"me");
+        User? user = usersIService.get(name,me);
         if (user == null) { return null; }
         return user.userId;
     }

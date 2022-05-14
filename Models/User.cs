@@ -10,7 +10,6 @@ public class User
     public string userId { get; set; }
     [JsonProperty(PropertyName = "id")]
     public string fullName { get; set; }
-    //[JsonIgnore]
     public string password { get; set; }
     [JsonProperty(PropertyName = "name")]
     public string nickName { get; set; }

@@ -2,9 +2,9 @@
 {
     private readonly DataContext context = new();
 
-    public void addContact(string id, string contact)
+    public void addContact(string userId, string contactId)
     {
-        context.chats.Add(new Chat(id, contact));
+        context.chats.Add(new Chat(userId, contactId));
         context.SaveChanges();
     }
 
@@ -28,9 +28,9 @@
     }
 
 
-    public void delete(string id, string server)
+    public void delete(string userId, string server)
     {
-        User? user = context.users.Find(id + "," + server);
+        User? user = context.users.Find(userId + "," + server);
         if (user != null)
         {
             context.Remove(user);
@@ -39,45 +39,45 @@
         }
     }
 
-    public User? get(string id, string server)
+    public User? get(string userId, string server)
     {
-        return context.users.Find(id + "," + server);
+        return context.users.Find(userId + "," + server);
     }
     private string findLastMsg(string userId, string contactId)
     {
         var chatId = context.chats.Where(x => x.id.Contains(contactId) && x.id.Contains(userId)).FirstOrDefault().id;
-        var res = context.messages.Where(m => m.chatId == chatId);
-        var res1 = res.OrderBy(m => m.created).ToList();
-        if (res1.Capacity == 0) return "";
-        var res2 = res1.Last().content;
-        return res2 != null ? res2 : "";
+        var chat = context.messages.Where(m => m.chatId == chatId);
+        var Ochat = chat.OrderBy(m => m.created).ToList();
+        if (Ochat.Capacity == 0) return "";
+        var lastMsg = Ochat.Last().content;
+        return lastMsg != null ? lastMsg : "";
     }
     public List<User> getAllContacts(string userId)
     {
-        var t = context.chats;
-        var t1 = t.Where(x => x.id.Contains(userId)).ToList();
-        var t2 = new List<User>();
-        foreach (var x in t1)
+        var chats = context.chats;
+        var userChats = chats.Where(x => x.id.Contains(userId)).ToList();
+        var result = new List<User>();
+        foreach (var chat in userChats)
         {
-            if (x.user1Id != userId)
+            if (chat.user1Id != userId)
             {
-                var u = context.users.Find(x.user1Id);
-                u.last = findLastMsg(userId, u.userId);
-                t2.Add(u);
+                var usr = context.users.Find(chat.user1Id);
+                usr.last = findLastMsg(userId, usr.userId);
+                result.Add(usr);
             }
-            if (x.user2Id != userId)
+            if (chat.user2Id != userId)
             {
-                var u = context.users.Find(x.user2Id);
-                u.last = findLastMsg(userId, u.userId);
-                t2.Add(u);
+                var usr = context.users.Find(chat.user2Id);
+                usr.last = findLastMsg(userId, usr.userId);
+                result.Add(usr);
             }
         }
-        return t2;
+        return result;
     }
 
-    public User? getContact(string id, string contact)
+    public User? getContact(string id, string contactId)
     {
-        return getAllContacts(id).Find(x => x.userId == contact);
+        return getAllContacts(id).Find(usr => usr.userId == contactId);
     }
 
     public void removeContact(string id, string contact)

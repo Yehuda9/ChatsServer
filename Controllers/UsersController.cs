@@ -13,9 +13,9 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        //private readonly DbContext userContext;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
+        private readonly static string me = "me";
 
         public UsersController(IConfiguration configuration, UsersIService usersIService)
         {
@@ -27,7 +27,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         [Route("login")]
         public IActionResult login(string name, string password)
         {
-            var user = usersService.get(name, "me");
+            var user = usersService.get(name, me);
 
             if (user != null && usersService.checkPassword(user, password))
             {
@@ -48,25 +48,17 @@ namespace JWTAuthentication.NET6._0.Controllers
             }
             return Unauthorized();
         }
-        /* [Authorize]
-         [HttpPost]
-         [Route("logout")]
-         public  IActionResult logout()
-         {
-
-         }*/
 
         [HttpPost]
         [Route("register")]
         public IActionResult register(string name, string nickName, string password, string profileImage)
         {
 
-            var userExists = usersService.get(name, "me");
+            var userExists = usersService.get(name, me);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name, nickName, "me", password);
+            usersService.create(name, nickName, me, password);
             return login(name, password);
-            //return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 
         private JwtSecurityToken getToken(List<Claim> authClaims)
