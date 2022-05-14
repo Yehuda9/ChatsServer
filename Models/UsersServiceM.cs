@@ -17,9 +17,9 @@
         return false;
     }
 
-    public void create(string fullName,string nickName, string server, string password = "")
+    public void create(string fullName, string nickName, string server, string password = "")
     {
-        var user = new User(fullName, server,nickName, password);
+        var user = new User(fullName, server, nickName, password);
         if (!context.users.Contains(user))
         {
             context.Add(user);
@@ -30,7 +30,7 @@
 
     public void delete(string id, string server)
     {
-        User? user = context.users.Find(id+","+server);
+        User? user = context.users.Find(id + "," + server);
         if (user != null)
         {
             context.Remove(user);
@@ -43,21 +43,33 @@
     {
         return context.users.Find(id + "," + server);
     }
-
-    public List<User> getAllContacts(string id)
+    private string findLastMsg(string userId, string contactId)
+    {
+        var chatId = context.chats.Where(x => x.id.Contains(contactId) && x.id.Contains(userId)).FirstOrDefault().id;
+        var res = context.messages.Where(m => m.chatId == chatId);
+        var res1 = res.OrderBy(m => m.created).ToList();
+        if (res1.Capacity == 0) return "";
+        var res2 = res1.Last().content;
+        return res2 != null ? res2 : "";
+    }
+    public List<User> getAllContacts(string userId)
     {
         var t = context.chats;
-        var t1 = t.Where(x=>x.id.Contains(id)).ToList();
-        var t2=new List<User>();
+        var t1 = t.Where(x => x.id.Contains(userId)).ToList();
+        var t2 = new List<User>();
         foreach (var x in t1)
         {
-            if (x.user1Id != id)
+            if (x.user1Id != userId)
             {
-                t2.Add(context.users.Find(x.user1Id));
+                var u = context.users.Find(x.user1Id);
+                u.last = findLastMsg(userId, u.userId);
+                t2.Add(u);
             }
-            if (x.user2Id != id)
+            if (x.user2Id != userId)
             {
-                t2.Add(context.users.Find(x.user2Id));
+                var u = context.users.Find(x.user2Id);
+                u.last = findLastMsg(userId, u.userId);
+                t2.Add(u);
             }
         }
         return t2;
