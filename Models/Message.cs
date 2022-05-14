@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Message
 {
     [Key]
-    //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string MessageId { get; set; }
     public DateTime created { get; set; }
     public string? content { get; set; }
