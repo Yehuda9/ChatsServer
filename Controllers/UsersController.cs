@@ -9,18 +9,22 @@ using System.Text;
 
 namespace JWTAuthentication.NET6._0.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly UsersIService? usersService;
+        private readonly MessagesIService? _messagesService;
         private readonly IConfiguration _configuration;
         private readonly static string me = "me";
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService)
+        public UsersController(IConfiguration configuration,
+            UsersIService usersIService,
+            MessagesIService messagesIService)
         {
             usersService = usersIService;
             _configuration = configuration;
+            _messagesService = messagesIService;
         }
 
         [HttpPost]
@@ -74,6 +78,68 @@ namespace JWTAuthentication.NET6._0.Controllers
                 );
 
             return token;
+        }
+        [HttpPost]
+        [Route("invitations")]
+        
+        public IActionResult addConversation(Invitation pl)
+        {
+            
+            if (pl == null) return NotFound("Wrong invitaion.");
+            // server means who sent the message. Inner inv. are taken care in other cmd
+            if (pl.server == me) return Ok("This is an inside-DB invitation. Ignoring."); 
+            
+            // check if the destination IS in our db
+            User? to = usersService.get(pl.to, me);
+            if (to == null) return NotFound("No such user (failed finding 'to').");
+            User? from = usersService.get(pl.from, me);
+            if (from == null) from = new User(pl.from, pl.server, "");
+            string response;
+            if (usersService.getContact(from.userId, to.userId) == null)
+            {
+                usersService.addContact(from.userId, to.userId);
+                response = "Conversation established.";
+            }
+            else
+            {
+                response = "Conversation already exists.";
+            }
+            return Ok(response);
+        }
+        public class Invitation
+        {
+            public string from { get; set; }
+            public string to { get; set; }
+            public string server { get; set; }
+        };
+
+        [HttpPost]
+        [Route("transfer")]
+        public IActionResult newMessageEntering(TransMessage msg)
+        {
+            if (msg == null) return NotFound("Wrong transferred message.");
+            // if msg comes from me, ignore - PROBLEM : no server
+            if (usersService.get(msg.from, me) != null) return Ok("This in an inside-DB message. Ignoring.");
+            // check that destination IS in db
+            User? to = usersService.get(msg.to, me);
+            if (to == null) return NotFound("No such user in DB (failed finding '" + msg.to + "').");
+
+            // if no chat exists unable sending
+
+            var chat = usersService.getChatByName(to.userId, msg.from);
+            if (chat == null) 
+                return Unauthorized("No chat established between " + msg.from + " and " + msg.to + ".");
+
+            _messagesService.addMessage(chat.user1Id, chat.user2Id, msg.content);
+            
+            return Ok("Message saved in DB.");
+        }
+
+        public class TransMessage
+        {
+            public string from { get; set; }
+            public string to { get; set; }
+            public string content { get; set; }
         }
     }
 }

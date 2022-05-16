@@ -74,6 +74,13 @@
         }
         return result;
     }
+    
+    public Chat? getChatByName(string userID, string contactName)
+    {
+        var chats = context.chats;
+        var userChats = chats.Where(x => x.id.Contains(userID)).ToList();
+        return userChats.Find((c) => (c.user1Id.Contains(contactName) || c.user2Id.Contains(contactName)));
+    }
 
     public User? getContact(string id, string contactId)
     {

@@ -8,6 +8,7 @@ public interface UsersIService
     public List<User> getAllContacts(string id);
     public User? getContact(string id,string contact);
     public void addContact(string id,string contact);
+    public Chat? getChatByName(string userID, string contactName);
     public void removeContact(string id,string contact);
     public bool checkPassword(User user,string password);
 }

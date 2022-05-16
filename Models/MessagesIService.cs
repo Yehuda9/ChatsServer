@@ -1,5 +1,6 @@
 ﻿public interface MessagesIService
 {
+    public void addMessage(string fromID, string toID, string content, string chatID);
     public void addMessage(string from, string to, string content);
     public List<Message> getMessages(string user,string contact);
     public Message? getMessage(string user, string contact, string msg);
