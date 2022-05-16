@@ -32,7 +32,6 @@ public class MessagesServiceM : MessagesIService
     {
         getMessage(user, contact, msg).content = content;
         context.SaveChanges();
-
     }
 }
 
