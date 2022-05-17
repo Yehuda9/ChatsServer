@@ -43,14 +43,21 @@
     {
         return context.users.Find(userId + "," + server);
     }
-    private string findLastMsg(string userId, string contactId)
+    private void findLastMsg(User user, string contactId)
     {
-        var chatId = context.chats.Where(x => x.id.Contains(contactId) && x.id.Contains(userId)).FirstOrDefault().id;
+        var chatId = context.chats.Where(x => (x.user1Id == contactId && x.user2Id == user.userId) || (x.user2Id == contactId && x.user1Id == user.userId)).FirstOrDefault().id;
         var chat = context.messages.Where(m => m.chatId == chatId);
         var Ochat = chat.OrderBy(m => m.created).ToList();
-        if (Ochat.Capacity == 0) return "";
+        if (Ochat.Capacity == 0)
+        {
+            user.last = "";
+            return;
+        }
         var lastMsg = Ochat.Last().content;
-        return lastMsg != null ? lastMsg : "";
+        var lastDate = Ochat.Last().created;
+        user.last = lastMsg != null ? lastMsg : "";
+        user.lastDate = lastDate;
+
     }
     public List<User> getAllContacts(string userId)
     {
@@ -61,15 +68,15 @@
         {
             if (chat.user1Id != userId)
             {
-                var usr = context.users.Find(chat.user1Id);
-                usr.last = findLastMsg(userId, usr.userId);
-                result.Add(usr);
+                var contact = context.users.Find(chat.user1Id);
+                findLastMsg(contact, userId);
+                result.Add(contact);
             }
             if (chat.user2Id != userId)
             {
-                var usr = context.users.Find(chat.user2Id);
-                usr.last = findLastMsg(userId, usr.userId);
-                result.Add(usr);
+                var contact = context.users.Find(chat.user2Id);
+                findLastMsg(contact, userId);
+                result.Add(contact);
             }
         }
         return result;
