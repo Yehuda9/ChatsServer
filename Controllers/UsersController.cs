@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,14 +14,16 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly Hub chatHub;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
         private readonly static string me = "me";
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService)
+        public UsersController(IConfiguration configuration, UsersIService usersIService, Hub chatHub)
         {
             usersService = usersIService;
             _configuration = configuration;
+            this.chatHub = chatHub;
         }
 
         [HttpPost]
@@ -39,7 +42,9 @@ namespace JWTAuthentication.NET6._0.Controllers
                 };
 
                 var token = getToken(authClaims);
+                //var connectionId = chatHub.Get(assignedTo);
 
+                //chatHub.Clients.Group().Add(user);
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),

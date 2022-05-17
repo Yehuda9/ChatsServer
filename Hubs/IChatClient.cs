@@ -1,4 +1,4 @@
-﻿public interface IChatClient
+﻿/*public interface IChatClient
 {
     Task ReceiveMessage(Message message);
-}
+}*/

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 [Authorize]
@@ -7,14 +8,17 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
+    private readonly Hub chatHub;
+
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis,MessagesIService mis)
+    public ContactsController(UsersIService uis,MessagesIService mis,Hub chatHub)
     {
         usersIService = uis;
         messagesIService = mis;
+        this.chatHub = chatHub;
     }
 
     [HttpGet]
@@ -105,11 +109,25 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id, string content)
+    public async Task<IActionResult> createContactMessage(string id, string content)
     {
         try
         {
             messagesIService.addMessage(getUser(),id,content);
+            var m = new Message();
+            m.created = DateTime.Now;
+            m.content = content;
+            m.fromId = getUser();
+            m.toId = id;
+            //chatHub.Clients.User(chatHub.)
+            //var u = chatHub.Clients.User(id.Split(',')[0]);
+            //await u.ReceiveMessage(m);
+            //await u.SendAsync("ReceiveMessage", m);
+
+            //await chatHub.Clients.AllExcept(this.HttpContext.Connection.Id).ReceiveMessage(m);
+            //await chatHub.Clients.All.ReceiveMessage(m);
+
+            //await chatHub.Clients.User(getUser()).ReceiveMessage(getUser(),id,content);
             return Ok();
 
         }
