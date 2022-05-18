@@ -28,11 +28,11 @@ public class ChatHub : Hub
     {
         return Context.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
     }
-    public async Task SendMessage(string id)
+    public async Task SendMessage(string id,string message)
     {
         //await Clients.All.SendAsync("ReceiveMessage");
 
-        await Clients.Clients(idToConnection[id.Split(',')[0]]).SendAsync("ReceiveMessage");
+        await Clients.Clients(idToConnection[id.Split(',')[0]]).SendAsync("ReceiveMessage",message);
         //await Clients.User(from).ReceiveMessage(,to, content);
 
         // await Clients.User(to).ReceiveMessage(to, content);
