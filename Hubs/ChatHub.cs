@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.SignalR;
 
 
-[Authorize]
+//[Authorize]
 public class ChatHub : Hub
 {
-    public Dictionary<string,string> idToConnection;
-    public ChatHub()
+    public static Dictionary<string,string> idToConnection=new();
+    /*public ChatHub()
     {
         idToConnection = new Dictionary<string,string>();
-    }
+    }*/
 
     public override Task OnConnectedAsync()
     {
@@ -19,14 +19,20 @@ public class ChatHub : Hub
         // After the code in this method completes, the client is informed that
         // the connection is established; for example, in a JavaScript client,
         // the start().done callback is executed.
-        string? name = Context.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
+        string? name = getName();
         var ConnectionID = Context.ConnectionId;
         idToConnection[name] = ConnectionID;
         return base.OnConnectedAsync();
     }
+    private string? getName()
+    {
+        return Context.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
+    }
     public async Task SendMessage(string id)
     {
-        await Clients.Clients(idToConnection[id]).SendAsync("ReceiveMessage");
+        //await Clients.All.SendAsync("ReceiveMessage");
+
+        await Clients.Clients(idToConnection[id.Split(',')[0]]).SendAsync("ReceiveMessage");
         //await Clients.User(from).ReceiveMessage(,to, content);
 
         // await Clients.User(to).ReceiveMessage(to, content);
