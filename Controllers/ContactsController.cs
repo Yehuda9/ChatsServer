@@ -8,13 +8,13 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly Hub chatHub;
+    private readonly ChatHub chatHub;
 
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis,MessagesIService mis,Hub chatHub)
+    public ContactsController(UsersIService uis,MessagesIService mis,ChatHub chatHub)
     {
         usersIService = uis;
         messagesIService = mis;
@@ -119,6 +119,10 @@ public class ContactsController : ControllerBase
             m.content = content;
             m.fromId = getUser();
             m.toId = id;
+            await chatHub.SendMessage(getUser(),id, content);
+
+            //await chatHub.Clients.All.SendAsync("ReceiveMessage", content);
+            //chatHub.Clients.Users(getUser()).SendAsync(id,content);
             //chatHub.Clients.User(chatHub.)
             //var u = chatHub.Clients.User(id.Split(',')[0]);
             //await u.ReceiveMessage(m);

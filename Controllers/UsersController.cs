@@ -14,12 +14,12 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly Hub chatHub;
+        private readonly ChatHub chatHub;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
         private readonly static string me = "me";
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService, Hub chatHub)
+        public UsersController(IConfiguration configuration, UsersIService usersIService, ChatHub chatHub)
         {
             usersService = usersIService;
             _configuration = configuration;
