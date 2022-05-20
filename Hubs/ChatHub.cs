@@ -2,14 +2,10 @@
 using Microsoft.AspNetCore.SignalR;
 
 
-//[Authorize]
+[Authorize]
 public class ChatHub : Hub
 {
     public readonly static Dictionary<string,string> idToConnection=new();
-    /*public ChatHub()
-    {
-        idToConnection = new Dictionary<string,string>();
-    }*/
 
     public override Task OnConnectedAsync()
     {
@@ -31,23 +27,8 @@ public class ChatHub : Hub
 
     public async Task SendMessage(string from,string to,string message)
     {
-        //await Clients.All.SendAsync("ReceiveMessage");
+        if (!idToConnection.ContainsKey(to.Split(',')[0])) { return; }
         await Clients.Clients(idToConnection[to.Split(',')[0]]).SendAsync("ReceiveMessage" , from, to, message);
-
-        await Clients.Clients(idToConnection[to.Split(',')[0]]).SendAsync("ReceiveMessage"+to,from,to,message);
-        //await Clients.User(from).ReceiveMessage(,to, content);
-
-        // await Clients.User(to).ReceiveMessage(to, content);
-        //await Clients.All.ReceiveMessage(message);
-        //return null;
     }
-    /*private string? getUser()
-    {
-        string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
-        if (name == null) { return null; }
-        User? user = usersIService.get(name, me);
-        if (user == null) { return null; }
-        return user.userId;
-    }*/
 }
 

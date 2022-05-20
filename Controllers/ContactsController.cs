@@ -26,26 +26,27 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(usersIService.getAllContacts(getUser()));
+            return Ok(usersIService.getAllContacts(getUser()));
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPost]
-    public IActionResult createContact(string id, string name, string server)
+    public async Task<IActionResult> createContact(string id, string name, string server)
     {
         try
         {    
             usersIService.create(id,name, server);
             var u = usersIService.get(id,server);
             usersIService.addContact(getUser(), u.userId);
-            return Ok();
+            await chatHub.SendMessage(getUser(),u.userId, server);
+            return StatusCode(201);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound(ex);
         }
 
     }
@@ -55,12 +56,12 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(usersIService.getContact(getUser(), id));
+            return Ok(usersIService.getContact(getUser(), id));
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPut]
@@ -70,12 +71,12 @@ public class ContactsController : ControllerBase
         try
         {
             usersIService.update(usersIService.getContact(getUser(),id).userId,name,server);
-            return Ok();
+            return StatusCode(204);
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpDelete]
@@ -85,12 +86,12 @@ public class ContactsController : ControllerBase
         try
         {
             usersIService.removeContact(getUser(), id);
-            return Ok();
+            return StatusCode(204);
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpGet]
@@ -99,45 +100,32 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(messagesIService.getMessages(getUser(),id));
-            return Ok();
+            return Ok(messagesIService.getMessages(getUser(),id));
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public async Task<IActionResult> createContactMessage(string id, string content)
+    public async Task<IActionResult> createContactMessage([FromBody] CreateContactMessagePayLoad ccm)
     {
+        if(ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
         try
         {
-            messagesIService.addMessage(getUser(),id,content);
-            var m = new Message();
+            messagesIService.addMessage(getUser(), ccm.id, ccm.content);
+            /*var m = new Message();
             m.created = DateTime.Now;
-            m.content = content;
+            m.content = ccm.content;
             m.fromId = getUser();
-            m.toId = id;
-            await chatHub.SendMessage(getUser(),id, content);
-
-            //await chatHub.Clients.All.SendAsync("ReceiveMessage", content);
-            //chatHub.Clients.Users(getUser()).SendAsync(id,content);
-            //chatHub.Clients.User(chatHub.)
-            //var u = chatHub.Clients.User(id.Split(',')[0]);
-            //await u.ReceiveMessage(m);
-            //await u.SendAsync("ReceiveMessage", m);
-
-            //await chatHub.Clients.AllExcept(this.HttpContext.Connection.Id).ReceiveMessage(m);
-            //await chatHub.Clients.All.ReceiveMessage(m);
-
-            //await chatHub.Clients.User(getUser()).ReceiveMessage(getUser(),id,content);
-            return Ok();
-
+            m.toId = ccm.id;*/
+            await chatHub.SendMessage(getUser(), ccm.id, ccm.content);
+            return StatusCode(201);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpGet]
@@ -151,21 +139,22 @@ public class ContactsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, string id2, string content)
+    public async Task<ActionResult<string>> editContactMessage(string id, string id2, string content)
     {
         try
         {
             messagesIService.updateMessage(getUser(), id, id2, content);
-            return Ok();
+            await chatHub.SendMessage(getUser(), id, id2);
+            return StatusCode(204);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     private string? getUser()

@@ -28,23 +28,21 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult login(string name, string password)
+        public IActionResult login([FromBody] LoginPayLoad userInfo)
         {
-            var user = usersService.get(name, me);
+            var user = usersService.get(userInfo.name, me);
 
-            if (user != null && usersService.checkPassword(user, password))
+            if (user != null && usersService.checkPassword(user, userInfo.password))
             {
 
                 var authClaims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim("name", name),
+                    new Claim("name", userInfo.name),
                 };
 
                 var token = getToken(authClaims);
-                //var connectionId = chatHub.Get(assignedTo);
 
-                //chatHub.Clients.Group().Add(user);
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -56,14 +54,17 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register(string name, string nickName, string password, string profileImage)
+        public IActionResult register([FromBody] RegisterPayLoad userInfo)
         {
-
-            var userExists = usersService.get(name, me);
-            if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name, nickName, me, password);
-            return login(name, password);
+            var userExists = usersService.get(userInfo.name, me);
+            if (userExists != null) return Unauthorized("User already exists!");
+            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.password);
+            var loginPayLoad = new LoginPayLoad
+            {
+                name = userInfo.name,
+                password = userInfo.password
+            };
+            return login(loginPayLoad);
         }
 
         private JwtSecurityToken getToken(List<Claim> authClaims)

@@ -4,7 +4,7 @@
 
     public void addContact(string userId, string contactId)
     {
-        if (getContact(userId,contactId) == null)
+        if (getContact(userId, contactId) == null)
         {
             context.chats.Add(new Chat(userId, contactId));
             context.SaveChanges();
@@ -50,8 +50,14 @@
     public Chat? getChatByName(string userId, string contactName)
     {
         var chats = context.chats;
-        var userChats = chats.Where(x => x.id.Contains(userId)).ToList();
-        return userChats.Find((c) => (c.user1Id.Split(",")[0]==contactName || c.user2Id.Split(",")[0] == contactName));
+        var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
+        return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
+    }
+    public Chat? getChatByIds(string userId, string contactId)
+    {
+        var chats = context.chats;
+        var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
+        return userChats.Find(c => c.user1Id == contactId || c.user2Id == contactId);
     }
     private void findLastMsg(User user, string contactId)
     {
@@ -72,7 +78,7 @@
     public List<User> getAllContacts(string userId)
     {
         var chats = context.chats;
-        var userChats = chats.Where(x => x.id.Contains(userId)).ToList();
+        var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
         var result = new List<User>();
         foreach (var chat in userChats)
         {
@@ -97,9 +103,10 @@
         return getAllContacts(id).Find(usr => usr.userId == contactId);
     }
 
-    public void removeContact(string id, string contact)
+    public void removeContact(string id, string contactId)
     {
-        //context.users.Find(id).userMessages.Remove(co);
+        var chat = getChatByIds(id, contactId);
+        context.chats.Remove(chat);
     }
 
     public void update(string id, string name, string password, string server = "")

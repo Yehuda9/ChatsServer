@@ -1,22 +1,21 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 public class User
 {
     [Key]
-    [IgnoreDataMember]
     public string userId { get; set; }
-    [JsonProperty(PropertyName = "id")]
+    [JsonPropertyName("id")]
     public string fullName { get; set; }
+    [JsonIgnore]
     public string password { get; set; }
-    [JsonProperty(PropertyName = "name")]
+    [JsonPropertyName("name")]
     public string nickName { get; set; }
     public string server { get; set; }
     public string last { get; set; }
     public DateTime lastDate { get; set; }
-
     public List<Chat> userMessages { get; set; }
     public User()
     {
@@ -31,12 +30,12 @@ public class User
         this.server = server;
         this.userMessages = new List<Chat>();
         last = "";
-        lastDate = DateTime.Now; 
+        lastDate = DateTime.Now;
     }
     public bool chackPassword(string pass)
     {
-        if (pass == null) return false;
-        return password.Equals(pass);
+        if (pass == null || this.password == "") return false;
+        return password == pass;
     }
 }
 

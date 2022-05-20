@@ -10,3 +10,22 @@ public class InvitationsPayLoad
     public string to { get; set; }
     public string server { get; set; }
 };
+public class RegisterPayLoad
+{
+    public string name { get; set; }
+    public string nickName { get; set; }
+    public string password { get; set; }
+    public string profileImage { get; set; }
+}
+
+public class LoginPayLoad
+{
+    public string name { get; set; }
+    public string password { get; set; }
+}
+
+public class CreateContactMessagePayLoad
+{
+    public string id { get; set; }
+    public string content { get; set; }
+}
