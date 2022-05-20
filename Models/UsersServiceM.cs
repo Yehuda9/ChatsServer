@@ -4,8 +4,12 @@
 
     public void addContact(string userId, string contactId)
     {
-        context.chats.Add(new Chat(userId, contactId));
-        context.SaveChanges();
+        if (getContact(userId,contactId) == null)
+        {
+            context.chats.Add(new Chat(userId, contactId));
+            context.SaveChanges();
+        }
+
     }
 
     public bool checkPassword(User user, string password)
@@ -42,6 +46,12 @@
     public User? get(string userId, string server)
     {
         return context.users.Find(userId + "," + server);
+    }
+    public Chat? getChatByName(string userId, string contactName)
+    {
+        var chats = context.chats;
+        var userChats = chats.Where(x => x.id.Contains(userId)).ToList();
+        return userChats.Find((c) => (c.user1Id.Split(",")[0]==contactName || c.user2Id.Split(",")[0] == contactName));
     }
     private void findLastMsg(User user, string contactId)
     {
