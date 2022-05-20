@@ -5,7 +5,6 @@ public interface UsersIService
     public void update(string id, string name, string password="",string server="");
     public void delete(string name,string server);
     public User? get(string name,string server);
-    public Chat? getChatByName(string userID, string contactName);
     public List<User> getAllContacts(string id);
     public User? getContact(string id,string contact);
     public void addContact(string id,string contact);

@@ -47,13 +47,8 @@
     {
         return context.users.Find(userId + "," + server);
     }
-    public Chat? getChatByName(string userId, string contactName)
-    {
-        var chats = context.chats;
-        var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
-        return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
-    }
-    public Chat? getChatByIds(string userId, string contactId)
+   
+    private Chat? getChatByIds(string userId, string contactId)
     {
         var chats = context.chats;
         var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();

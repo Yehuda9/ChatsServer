@@ -38,7 +38,7 @@ public class HomeController : ControllerBase
         User? to = usersService.get(msg.to, me);//get dest, user in my server
         if (to == null) return BadRequest();//if not user in my server, 400
         
-        var chat = usersService.getChatByName(to.userId, msg.from);//check that chat exists
+        var chat = messagesIService.getChatByName(to.userId, msg.from);//check that chat exists
         if (chat == null) return BadRequest();//if not,400
         
         var fromId = chat.user2Id == to.userId ? chat.user1Id : chat.user2Id;//fromId 
