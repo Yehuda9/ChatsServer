@@ -117,7 +117,12 @@ public class ContactsController : ControllerBase
         if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
         try
         {
-            messagesIService.addMessage(getUser(), ccm.id, ccm.content);
+            FileModel file = null;
+            if (ccm.formFile != null)
+            {
+                file = new(ccm.formFile);
+            }
+            messagesIService.addMessage(getUser(), ccm.id, ccm.content,file);
             /*var m = new Message();
             m.created = DateTime.Now;
             m.content = ccm.content;

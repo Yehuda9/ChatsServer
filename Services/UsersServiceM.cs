@@ -25,6 +25,11 @@ public class UsersServiceM : UsersIService
 
     public void create(string fullName, string nickName, string server, Img img=null, string password = "")
     {
+        if(img == null)
+        {
+            byte[] bytes = File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
+            img = new Img(bytes);
+        }
         var user = new User(fullName, server, nickName, password,img);
         if (get(fullName,server)==null)
         {
