@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chats.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220516203351_crete")]
+    partial class crete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
@@ -49,20 +51,6 @@ namespace Chats.Migrations
                     b.ToTable("ChatUser");
                 });
 
-            modelBuilder.Entity("Img", b =>
-                {
-                    b.Property<string>("id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("image")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Img");
-                });
-
             modelBuilder.Entity("Message", b =>
                 {
                     b.Property<string>("MessageId")
@@ -76,7 +64,8 @@ namespace Chats.Migrations
                     b.Property<string>("content")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("created")
+                    b.Property<string>("created")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("fromId")
@@ -121,16 +110,11 @@ namespace Chats.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("profileImgid")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("server")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("userId");
-
-                    b.HasIndex("profileImgid");
 
                     b.ToTable("users");
                 });
@@ -157,15 +141,6 @@ namespace Chats.Migrations
                         .HasForeignKey("chatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.HasOne("Img", "profileImg")
-                        .WithMany()
-                        .HasForeignKey("profileImgid");
-
-                    b.Navigation("profileImg");
                 });
 
             modelBuilder.Entity("Chat", b =>

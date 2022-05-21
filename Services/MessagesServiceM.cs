@@ -1,5 +1,4 @@
-﻿
-public class MessagesServiceM : MessagesIService
+﻿public class MessagesServiceM : MessagesIService
 {
     DataContext context = new();
 
@@ -32,7 +31,12 @@ public class MessagesServiceM : MessagesIService
     {
         getMessage(user, contact, msg).content = content;
         context.SaveChanges();
-
+    }
+    public Chat? getChatByName(string userId, string contactName)
+    {
+        var chats = context.chats;
+        var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
+        return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
     }
 }
 

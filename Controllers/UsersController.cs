@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Web.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,29 +15,32 @@ namespace JWTAuthentication.NET6._0.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ChatHub chatHub;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
         private readonly static string me = "me";
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService)
+        public UsersController(IConfiguration configuration, UsersIService usersIService, ChatHub chatHub)
         {
             usersService = usersIService;
             _configuration = configuration;
+            this.chatHub = chatHub;
         }
 
         [HttpPost]
         [Route("login")]
-        public IActionResult login(string name, string password)
+        public IActionResult login([FromForm] LoginPayLoad userInfo)
         {
-            var user = usersService.get(name, me);
+            if (userInfo == null || userInfo.name == null || userInfo.password == null) { return BadRequest(); }
+            var user = usersService.get(userInfo.name, me);
 
-            if (user != null && usersService.checkPassword(user, password))
+            if (user != null && usersService.checkPassword(user, userInfo.password))
             {
 
                 var authClaims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim("name", name),
+                    new Claim("name", userInfo.name),
                 };
 
                 var token = getToken(authClaims);
@@ -51,14 +56,32 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register(string name, string nickName, string password, string profileImage)
+        public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
-
-            var userExists = usersService.get(name, me);
-            if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
-            usersService.create(name, nickName, me, password);
-            return login(name, password);
+            if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
+            Img proImg = null;
+            if (userInfo.profileImage == null || userInfo.profileImage.Length == 0)
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
+                proImg = new Img(bytes);
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await userInfo.profileImage.CopyToAsync(memoryStream);
+                    proImg = new Img(memoryStream.ToArray());
+                }
+            }
+            var userExists = usersService.get(userInfo.name, me);
+            if (userExists != null) return Unauthorized("User already exists!");
+            usersService.create(userInfo.name, userInfo.nickName, me, proImg, userInfo.password);
+            var loginPayLoad = new LoginPayLoad
+            {
+                name = userInfo.name,
+                password = userInfo.password
+            };
+            return login(loginPayLoad);
         }
 
         private JwtSecurityToken getToken(List<Claim> authClaims)

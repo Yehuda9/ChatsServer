@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 [Authorize]
@@ -7,14 +8,17 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
+    private readonly ChatHub chatHub;
+
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis,MessagesIService mis)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub)
     {
         usersIService = uis;
         messagesIService = mis;
+        this.chatHub = chatHub;
     }
 
     [HttpGet]
@@ -22,26 +26,30 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(usersIService.getAllContacts(getUser()));
+            return Ok(usersIService.getAllContacts(getUser()));
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPost]
-    public IActionResult createContact(string id, string name, string server)
+    public async Task<IActionResult> createContact([FromForm] CreateContactPayLoad ccp)
     {
+        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null) { 
+            return BadRequest();
+        }
         try
-        {    
-            usersIService.create(id,name, server);
-            var u = usersIService.get(id,server);
+        {
+            usersIService.create(ccp.id, ccp.name, ccp.server);
+            var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
-            return Ok();
+            await chatHub.SendMessage(getUser(), u.userId, ccp.server);
+            return StatusCode(201);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound(ex);
         }
 
     }
@@ -51,12 +59,12 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(usersIService.getContact(getUser(), id));
+            return Ok(usersIService.getContact(getUser(), id));
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPut]
@@ -65,13 +73,13 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            usersIService.update(usersIService.getContact(getUser(),id).userId,name,server);
-            return Ok();
+            usersIService.update(usersIService.getContact(getUser(), id).userId, name, server);
+            return StatusCode(204);
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpDelete]
@@ -81,12 +89,12 @@ public class ContactsController : ControllerBase
         try
         {
             usersIService.removeContact(getUser(), id);
-            return Ok();
+            return StatusCode(204);
 
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpGet]
@@ -95,27 +103,32 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return JsonSerializer.Serialize(messagesIService.getMessages(getUser(),id));
-            return Ok();
+            return Ok(messagesIService.getMessages(getUser(), id));
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public IActionResult createContactMessage(string id, string content)
+    public async Task<IActionResult> createContactMessage([FromForm] CreateContactMessagePayLoad ccm)
     {
+        if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
         try
         {
-            messagesIService.addMessage(getUser(),id,content);
-            return Ok();
-
+            messagesIService.addMessage(getUser(), ccm.id, ccm.content);
+            /*var m = new Message();
+            m.created = DateTime.Now;
+            m.content = ccm.content;
+            m.fromId = getUser();
+            m.toId = ccm.id;*/
+            await chatHub.SendMessage(getUser(), ccm.id, ccm.content);
+            return StatusCode(201);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpGet]
@@ -129,28 +142,29 @@ public class ContactsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     [HttpPut]
     [Route("{id}/messages/{id2}")]
-    public ActionResult<string> editContactMessage(string id, string id2, string content)
+    public async Task<ActionResult<string>> editContactMessage(string id, string id2, string content)
     {
         try
         {
             messagesIService.updateMessage(getUser(), id, id2, content);
-            return Ok();
+            await chatHub.SendMessage(getUser(), id, id2);
+            return StatusCode(204);
         }
         catch (Exception ex)
         {
-            return Unauthorized();
+            return NotFound();
         }
     }
     private string? getUser()
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User? user = usersIService.get(name,me);
+        User? user = usersIService.get(name, me);
         if (user == null) { return null; }
         return user.userId;
     }
