@@ -16,12 +16,14 @@ public class User
     public string server { get; set; }
     public string last { get; set; }
     public DateTime lastDate { get; set; }
+    //[InverseProperty("users")]
     public List<Chat> userMessages { get; set; }
+    public Img profileImg { get; set; } 
     public User()
     {
         this.userMessages = new List<Chat>();
     }
-    public User(string fullName, string server, string nickName, string password = "")
+    public User(string fullName, string server, string nickName, string password = "", Img proImg = null)
     {
         this.userId = fullName + "," + server;
         this.fullName = fullName;
@@ -31,6 +33,7 @@ public class User
         this.userMessages = new List<Chat>();
         last = "";
         lastDate = DateTime.Now;
+        this.profileImg = proImg;
     }
     public bool chackPassword(string pass)
     {

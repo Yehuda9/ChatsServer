@@ -14,7 +14,7 @@ public class ContactsController : ControllerBase
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis,MessagesIService mis,ChatHub chatHub)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub)
     {
         usersIService = uis;
         messagesIService = mis;
@@ -34,14 +34,17 @@ public class ContactsController : ControllerBase
         }
     }
     [HttpPost]
-    public async Task<IActionResult> createContact(string id, string name, string server)
+    public async Task<IActionResult> createContact([FromForm] CreateContactPayLoad ccp)
     {
+        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null) { 
+            return BadRequest();
+        }
         try
-        {    
-            usersIService.create(id,name, server);
-            var u = usersIService.get(id,server);
+        {
+            usersIService.create(ccp.id, ccp.name, ccp.server);
+            var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
-            await chatHub.SendMessage(getUser(),u.userId, server);
+            await chatHub.SendMessage(getUser(), u.userId, ccp.server);
             return StatusCode(201);
         }
         catch (Exception ex)
@@ -70,7 +73,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            usersIService.update(usersIService.getContact(getUser(),id).userId,name,server);
+            usersIService.update(usersIService.getContact(getUser(), id).userId, name, server);
             return StatusCode(204);
 
         }
@@ -100,7 +103,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return Ok(messagesIService.getMessages(getUser(),id));
+            return Ok(messagesIService.getMessages(getUser(), id));
         }
         catch (Exception ex)
         {
@@ -109,9 +112,9 @@ public class ContactsController : ControllerBase
     }
     [HttpPost]
     [Route("{id}/messages")]
-    public async Task<IActionResult> createContactMessage([FromBody] CreateContactMessagePayLoad ccm)
+    public async Task<IActionResult> createContactMessage([FromForm] CreateContactMessagePayLoad ccm)
     {
-        if(ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
+        if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
         try
         {
             messagesIService.addMessage(getUser(), ccm.id, ccm.content);
@@ -161,7 +164,7 @@ public class ContactsController : ControllerBase
     {
         string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
         if (name == null) { return null; }
-        User? user = usersIService.get(name,me);
+        User? user = usersIService.get(name, me);
         if (user == null) { return null; }
         return user.userId;
     }

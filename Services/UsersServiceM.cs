@@ -21,10 +21,10 @@
         return false;
     }
 
-    public void create(string fullName, string nickName, string server, string password = "")
+    public void create(string fullName, string nickName, string server, Img img=null, string password = "")
     {
-        var user = new User(fullName, server, nickName, password);
-        if (!context.users.Contains(user))
+        var user = new User(fullName, server, nickName, password,img);
+        if (get(fullName,server)==null)
         {
             context.Add(user);
             context.SaveChanges();

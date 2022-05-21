@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Web.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,8 +29,9 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult login([FromBody] LoginPayLoad userInfo)
+        public IActionResult login([FromForm] LoginPayLoad userInfo)
         {
+            if (userInfo == null || userInfo.name == null || userInfo.password == null) { return BadRequest(); }
             var user = usersService.get(userInfo.name, me);
 
             if (user != null && usersService.checkPassword(user, userInfo.password))
@@ -54,11 +56,25 @@ namespace JWTAuthentication.NET6._0.Controllers
 
         [HttpPost]
         [Route("register")]
-        public IActionResult register([FromBody] RegisterPayLoad userInfo)
+        public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
+            if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
+            Img proImg = null;
+            if (userInfo.profileImage.Length==0)
+            {
+                proImg = new Img(new Uri("https://cdn-icons-png.flaticon.com/512/720/720236.png"));
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await userInfo.profileImage.CopyToAsync(memoryStream);
+                    proImg = new Img(memoryStream.ToArray());
+                }
+            }
             var userExists = usersService.get(userInfo.name, me);
             if (userExists != null) return Unauthorized("User already exists!");
-            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.password);
+            usersService.create(userInfo.name, userInfo.nickName, me, proImg, userInfo.password);
             var loginPayLoad = new LoginPayLoad
             {
                 name = userInfo.name,
