@@ -16,8 +16,9 @@ public class User
     public string server { get; set; }
     public string last { get; set; }
     public DateTime lastDate { get; set; }
-    //[InverseProperty("users")]
     public List<Chat> userMessages { get; set; }
+   /* [ForeignKey("profileImg")]
+    public string profileImgId { get; set; }*/
     public Img profileImg { get; set; } 
     public User()
     {

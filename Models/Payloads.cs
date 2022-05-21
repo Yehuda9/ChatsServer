@@ -21,7 +21,7 @@ public class RegisterPayLoad
     //[ModelBinder(BinderType = typeof(ByteArrayModelBinder))]
     /*[ModelBinder(Name = "profileImage")]
     public byte[] profileImage { get; set; }*/
-    public IFormFile profileImage { get; set; } 
+    public IFormFile? profileImage { get; set; } 
 }
 
 public class LoginPayLoad

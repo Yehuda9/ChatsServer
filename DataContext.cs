@@ -10,7 +10,10 @@ public class DataContext : DbContext
 
 
     //private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=";
-
+    public DataContext()
+    {
+        this.ChangeTracker.LazyLoadingEnabled = false;
+    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         string path = Directory.GetCurrentDirectory();
@@ -20,6 +23,8 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        /*modelBuilder.Entity<Img>().Property(i => i.image);
+        modelBuilder.Entity<User>().Property(u=>u.profileImg);*/
         modelBuilder.Entity<Message>().Property(e => e.MessageId).ValueGeneratedOnAdd();
     }
 

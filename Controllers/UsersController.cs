@@ -60,9 +60,10 @@ namespace JWTAuthentication.NET6._0.Controllers
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
             Img proImg = null;
-            if (userInfo.profileImage.Length==0)
+            if (userInfo.profileImage == null || userInfo.profileImage.Length == 0)
             {
-                proImg = new Img(new Uri("https://cdn-icons-png.flaticon.com/512/720/720236.png"));
+                byte[] bytes = System.IO.File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
+                proImg = new Img(bytes);
             }
             else
             {

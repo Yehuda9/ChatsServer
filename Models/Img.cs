@@ -27,4 +27,5 @@ public class Img
     public Img() { }
     public string id { get; private set; }
     public byte[] image { get; set; }
+    
 }

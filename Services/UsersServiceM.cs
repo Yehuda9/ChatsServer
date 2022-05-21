@@ -1,4 +1,6 @@
-﻿public class UsersServiceM : UsersIService
+﻿using Microsoft.EntityFrameworkCore;
+
+public class UsersServiceM : UsersIService
 {
     private readonly DataContext context = new();
 
@@ -45,9 +47,12 @@
 
     public User? get(string userId, string server)
     {
-        return context.users.Find(userId + "," + server);
+        return context.users.Include(u=>u.profileImg).Where(u=>u.userId==(userId + "," + server)).FirstOrDefault();
     }
-   
+    private User? get(string userId)
+    {
+        return context.users.Include(u => u.profileImg).Where(u => u.userId == userId).FirstOrDefault();
+    }
     private Chat? getChatByIds(string userId, string contactId)
     {
         var chats = context.chats;
@@ -79,13 +84,13 @@
         {
             if (chat.user1Id != userId)
             {
-                var contact = context.users.Find(chat.user1Id);
+                var contact = get(chat.user1Id);
                 findLastMsg(contact, userId);
                 result.Add(contact);
             }
             if (chat.user2Id != userId)
             {
-                var contact = context.users.Find(chat.user2Id);
+                var contact = get(chat.user2Id);
                 findLastMsg(contact, userId);
                 result.Add(contact);
             }
