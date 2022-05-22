@@ -23,15 +23,15 @@ public class UsersServiceM : UsersIService
         return false;
     }
 
-    public void create(string fullName, string nickName, string server, Img img=null, string password = "")
+    public void create(string fullName, string nickName, string server, Img img = null, string password = "")
     {
-        if(img == null)
+        if (img == null)
         {
             byte[] bytes = File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
             img = new Img(bytes);
         }
-        var user = new User(fullName, server, nickName, password,img);
-        if (get(fullName,server)==null)
+        var user = new User(fullName, server, nickName, password, img);
+        if (get(fullName, server) == null)
         {
             context.Add(user);
             context.SaveChanges();
@@ -52,7 +52,7 @@ public class UsersServiceM : UsersIService
 
     public User? get(string userId, string server)
     {
-        return context.users.Include(u=>u.profileImg).Where(u=>u.userId==(userId + "," + server)).FirstOrDefault();
+        return context.users.Include(u => u.profileImg).Where(u => u.userId == (userId + "," + server)).FirstOrDefault();
     }
     private User? get(string userId)
     {
@@ -100,6 +100,7 @@ public class UsersServiceM : UsersIService
                 result.Add(contact);
             }
         }
+        result = result.OrderBy(u => u.lastDate).Reverse().ToList();
         return result;
     }
 
