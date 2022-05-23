@@ -27,7 +27,9 @@ public class UsersServiceM : UsersIService
     {
         if (img == null)
         {
-            byte[] bytes = File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
+            string path = Directory.GetCurrentDirectory();
+            var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
+            byte[] bytes = File.ReadAllBytes(picPath);
             img = new Img(bytes);
         }
         var user = new User(fullName, server, nickName, password, img);
