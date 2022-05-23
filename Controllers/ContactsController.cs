@@ -44,13 +44,16 @@ public class ContactsController : ControllerBase
         }
         try
         {
-            HttpClient client = new HttpClient();
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+            HttpClient client = new HttpClient(clientHandler);
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", getUser() },
                 { "to", ccp.id },
                 {"server",ccp.server }
             });
-            var response = await client.PostAsync("https://"+ccp.server, content);
+            var response = await client.PostAsync("https://"+ccp.server+ "/invitations", content);
             return await homeController.addConversation(new InvitationsPayLoad { from = getUser(), to = ccp.id, server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
