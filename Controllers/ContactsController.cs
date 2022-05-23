@@ -9,13 +9,15 @@ using System.Text.Json;
 public class ContactsController : ControllerBase
 {
     private readonly ChatHub chatHub;
+    private readonly HomeController? homeController;
 
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, HomeController hm)
     {
+        homeController = hm;
         usersIService = uis;
         messagesIService = mis;
         this.chatHub = chatHub;
@@ -36,11 +38,20 @@ public class ContactsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> createContact([FromForm] CreateContactPayLoad ccp)
     {
-        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null) { 
+        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null)
+        {
             return BadRequest();
         }
         try
         {
+            HttpClient client = new HttpClient();
+            var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                { "from", getUser() },
+                { "to", ccp.id },
+                {"server",ccp.server }
+            });
+            var response = await client.PostAsync("http://www.example.com/recepticle.aspx", content);
+            return await homeController.addConversation(new InvitationsPayLoad { from = getUser(), to = ccp.id, server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
@@ -122,7 +133,7 @@ public class ContactsController : ControllerBase
             {
                 file = new(ccm.formFile);
             }
-            messagesIService.addMessage(getUser(), ccm.id, ccm.content,file);
+            messagesIService.addMessage(getUser(), ccm.id, ccm.content, file);
             /*var m = new Message();
             m.created = DateTime.Now;
             m.content = ccm.content;
