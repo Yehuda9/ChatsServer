@@ -131,6 +131,18 @@ public class ContactsController : ControllerBase
         if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
         try
         {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+            HttpClient client = new HttpClient(clientHandler);
+            var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                { "from", getUser() },
+                { "to", ccm.id },
+                {"content",ccm.content }
+            });
+            var to = usersIService.get(ccm.id);
+            var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+            return await homeController.newMessageEntering(new TransferPayload { from=getUser(),to=to.userId,content=ccm.content});
             FileModel file = null;
             if (ccm.formFile != null)
             {

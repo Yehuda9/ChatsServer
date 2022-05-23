@@ -54,7 +54,7 @@ public class UsersServiceM : UsersIService
     {
         return context.users.Include(u => u.profileImg).Where(u => u.userId == (userId + "," + server)).FirstOrDefault();
     }
-    private User? get(string userId)
+    public User? get(string userId)
     {
         return context.users.Include(u => u.profileImg).Where(u => u.userId == userId).FirstOrDefault();
     }
