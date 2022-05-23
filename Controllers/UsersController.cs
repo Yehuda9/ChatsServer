@@ -62,7 +62,9 @@ namespace JWTAuthentication.NET6._0.Controllers
             Img proImg = null;
             if (userInfo.profileImage == null || userInfo.profileImage.Length == 0)
             {
-                byte[] bytes = System.IO.File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
+                string path = Directory.GetCurrentDirectory();
+                var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
+                byte[] bytes = System.IO.File.ReadAllBytes(picPath);
                 proImg = new Img(bytes);
             }
             else
