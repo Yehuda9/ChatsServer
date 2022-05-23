@@ -53,8 +53,8 @@ public class ContactsController : ControllerBase
                 { "to", ccp.id },
                 {"server",ccp.server }
             });
-            var response = await client.PostAsync("https://"+ccp.server+ "/invitations", content);
-            return await homeController.addConversation(new InvitationsPayLoad { from = getUser(), to = ccp.id, server = ccp.server });
+            var response = await client.PostAsync("https://"+ccp.server+ "/api/invitations", content);
+            return await homeController.addConversation(new InvitationsPayLoad { from = ccp.id, to =getUser().Split(",")[0] , server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
