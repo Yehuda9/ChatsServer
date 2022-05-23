@@ -54,7 +54,7 @@ public class ContactsController : ControllerBase
                 {"server",ccp.server }
             });
             var response = await client.PostAsync("https://"+ccp.server+ "/api/invitations", content);
-            return await homeController.addConversation(new InvitationsPayLoad { from = ccp.id, to =getUser().Split(",")[0] , server = ccp.server });
+            //return await homeController.addConversation(new InvitationsPayLoad { from = ccp.id, to =getUser().Split(",")[0] , server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
@@ -135,14 +135,15 @@ public class ContactsController : ControllerBase
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
             HttpClient client = new HttpClient(clientHandler);
+            
+            var to = usersIService.get(ccm.id);
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", getUser() },
-                { "to", ccm.id },
+                { "to", to.fullName },
                 {"content",ccm.content }
             });
-            var to = usersIService.get(ccm.id);
             var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
-            return await homeController.newMessageEntering(new TransferPayload { from=getUser(),to=to.userId,content=ccm.content});
+            //return await homeController.newMessageEntering(new TransferPayload { from=getUser(),to=to.userId,content=ccm.content});
             FileModel file = null;
             if (ccm.formFile != null)
             {
