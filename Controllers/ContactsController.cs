@@ -137,8 +137,10 @@ public class ContactsController : ControllerBase
             HttpClient client = new HttpClient(clientHandler);
             
             var to = usersIService.get(ccm.id);
+            var from = usersIService.get(getUser());
+
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
-                { "from", getUser() },
+                { "from", from.fullName },
                 { "to", to.fullName },
                 {"content",ccm.content }
             });
