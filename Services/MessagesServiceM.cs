@@ -38,9 +38,9 @@ public class MessagesServiceM : MessagesIService
     {
         var chats = context.chats;
         var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
-        return userChats.Find((c) => (c.user1Id == contactName || c.user2Id == contactName));
+        //return userChats.Find((c) => (c.user1Id == contactName || c.user2Id == contactName));
 
-        //return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
+        return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
     }
 }
 
