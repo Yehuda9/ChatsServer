@@ -48,8 +48,9 @@ public class ContactsController : ControllerBase
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
             HttpClient client = new HttpClient(clientHandler);
+            var from = usersIService.get(getUser());
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
-                { "from", getUser() },
+                { "from", from.fullName },
                 { "to", ccp.id },
                 {"server",ccp.server }
             });
