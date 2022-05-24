@@ -68,7 +68,10 @@ public class ContactsController : ControllerBase
                 { "to", ccp.id },
                 {"server",GetLocalIPAddress() }
             });
-            var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
+            if (ccp.server != me)
+            {
+                var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
+            }
             //return await homeController.addConversation(new InvitationsPayLoad { from = ccp.id, to =getUser().Split(",")[0] , server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
@@ -143,7 +146,7 @@ public class ContactsController : ControllerBase
     [Route("{id}/messages")]
     public async Task<IActionResult> createContactMessage([FromForm] CreateContactMessagePayLoad ccm)
     {
-        if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
+        if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile==null)) { return BadRequest(); }
         try
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
@@ -159,7 +162,10 @@ public class ContactsController : ControllerBase
                 { "to", to.fullName },
                 {"content",ccm.content }
             });
-            var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+            if (to.server != me)
+            {
+                var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+            }
             //return await homeController.newMessageEntering(new TransferPayload { from=getUser(),to=to.userId,content=ccm.content});
             FileModel file = null;
             if (ccm.formFile != null)

@@ -33,7 +33,7 @@ public class HomeController : ControllerBase
     [Route("transfer")]
     public async Task<IActionResult> newMessageEntering([FromForm] TransferPayload msg)
     {
-        if (msg == null || msg.from == null || msg.to == null || msg.content == null) { return BadRequest(); }
+        if (msg == null || msg.from == null || msg.to == null || (msg.content == null && msg.formFile==null)) { return BadRequest(); }
         
         User? to = usersService.get(msg.to,me);//get dest, user in my server
         if (to == null) return BadRequest();//if not user in my server, 400

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Web.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -27,6 +26,23 @@ namespace JWTAuthentication.NET6._0.Controllers
             this.chatHub = chatHub;
         }
 
+        [HttpGet]
+        [Route("userExists")]
+        public ActionResult<bool> userExists(string name)
+        {
+            return usersService.get(name, me) != null;
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("getUser")]
+        public ActionResult<string> getUser()
+        {
+            string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
+            if (name == null) { return NotFound(); }
+            User? user = usersService.get(name, me);
+            if (user == null) { return NotFound(); }
+            return Ok(user);
+        }
         [HttpPost]
         [Route("login")]
         public IActionResult login([FromForm] LoginPayLoad userInfo)

@@ -5,7 +5,9 @@ public class TransferPayload
 {
     public string from { get; set; }
     public string to { get; set; }
-    public string content { get; set; }
+    public string? content { get; set; }
+    public IFormFile? formFile { get; set; }
+
 }
 public class InvitationsPayLoad
 {
@@ -30,7 +32,7 @@ public class LoginPayLoad
 public class CreateContactMessagePayLoad
 {
     public string id { get; set; }
-    public string content { get; set; }
+    public string? content { get; set; }
     public IFormFile? formFile { get; set; }
 }
 
