@@ -1,7 +1,7 @@
 ﻿
 public interface UsersIService
 {
-    public void create(string fullName,string nickName,string server, Img img=null, string password="");
+    public void create(string fullName,string nickName,string server, Img? img=null, string password="");
     public void update(string id, string name, string password="",string server="");
     public void delete(string name,string server);
     public User? get(string name,string server);

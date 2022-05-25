@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 public class User
 {
     [Key]
+    [JsonIgnore]
     public string userId { get; set; }
     [JsonPropertyName("id")]
     public string fullName { get; set; }
@@ -17,14 +18,14 @@ public class User
     public string last { get; set; }
     public DateTime lastDate { get; set; }
     public List<Chat> userMessages { get; set; }
-   /* [ForeignKey("profileImg")]
-    public string profileImgId { get; set; }*/
-    public Img profileImg { get; set; } 
+    /* [ForeignKey("profileImg")]
+     public string profileImgId { get; set; }*/
+    public Img profileImg { get; set; }
     public User()
     {
         this.userMessages = new List<Chat>();
     }
-    public User(string fullName, string server, string nickName, string password = "", Img proImg = null)
+    public User(string fullName, string server, string nickName, string password = "", Img? proImg = null)
     {
         this.userId = fullName + "," + server;
         this.fullName = fullName;
@@ -34,7 +35,17 @@ public class User
         this.userMessages = new List<Chat>();
         last = "";
         lastDate = DateTime.Now;
-        this.profileImg = proImg;
+        if (profileImg != null)
+        {
+            this.profileImg = proImg;
+        }
+        else
+        {
+            string path = Directory.GetCurrentDirectory();
+            var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
+            byte[] bytes = File.ReadAllBytes(picPath);
+            this.profileImg = new Img(bytes);
+        }
     }
     public bool chackPassword(string pass)
     {

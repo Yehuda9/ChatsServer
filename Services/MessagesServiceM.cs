@@ -4,7 +4,7 @@ public class MessagesServiceM : MessagesIService
 {
     DataContext context = new();
 
-    public void addMessage(string from, string to, string content, FileModel? fileModel = null)
+    public void addMessage(string from, string to, string? content, FileModel? fileModel = null)
     {
         var chat = context.chats.Where(c => (c.user1Id == from && c.user2Id == to) || (c.user1Id == to && c.user2Id == from)).First();
         context.messages.Add(new Message(from, to, content, chat.id,fileModel));

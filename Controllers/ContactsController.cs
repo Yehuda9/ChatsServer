@@ -11,31 +11,16 @@ using System.Text.Json;
 public class ContactsController : ControllerBase
 {
     private readonly ChatHub chatHub;
-    private readonly HomeController? homeController;
 
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly static string me = "me";
 
-    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, HomeController hm)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub)
     {
-        homeController = hm;
         usersIService = uis;
         messagesIService = mis;
         this.chatHub = chatHub;
-    }
-
-    [HttpGet]
-    public ActionResult<string> getAllContacts()
-    {
-        try
-        {
-            return Ok(usersIService.getAllContacts(getUser()));
-        }
-        catch (Exception ex)
-        {
-            return NotFound();
-        }
     }
     private string GetLocalIPAddress()
     {
@@ -49,6 +34,19 @@ public class ContactsController : ControllerBase
         }
         throw new Exception("No network adapters with an IPv4 address in the system!");
     }
+    [HttpGet]
+    public ActionResult<string> getAllContacts()
+    {
+        try
+        {
+            return Ok(usersIService.getAllContacts(getUser()));
+        }
+        catch (Exception ex)
+        {
+            return NotFound();
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> createContact([FromForm] CreateContactPayLoad ccp)
     {
@@ -58,21 +56,21 @@ public class ContactsController : ControllerBase
         }
         try
         {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-
-            HttpClient client = new HttpClient(clientHandler);
-            var from = usersIService.get(getUser());
-            var content = new FormUrlEncodedContent(new Dictionary<string, string> {
-                { "from", from.fullName },
-                { "to", ccp.id },
-                {"server",GetLocalIPAddress() }
-            });
             if (ccp.server != me)
             {
+                HttpClientHandler clientHandler = new()
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+
+                HttpClient client = new(clientHandler);
+                var from = usersIService.get(getUser());
+                var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                { "from", from.fullName },
+                { "to", ccp.id },
+                {"server",GetLocalIPAddress() }});
                 var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
             }
-            //return await homeController.addConversation(new InvitationsPayLoad { from = ccp.id, to =getUser().Split(",")[0] , server = ccp.server });
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
@@ -146,38 +144,34 @@ public class ContactsController : ControllerBase
     [Route("{id}/messages")]
     public async Task<IActionResult> createContactMessage([FromForm] CreateContactMessagePayLoad ccm)
     {
-        if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile==null)) { return BadRequest(); }
+        if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile == null)) { return BadRequest(); }
         try
         {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            var to = usersIService.get(ccm.id,me);
+            if (to !=null && to.server != me)
+            {
+                HttpClientHandler clientHandler = new()
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
 
-            HttpClient client = new HttpClient(clientHandler);
+                HttpClient client = new(clientHandler);
 
-            var to = usersIService.get(ccm.id);
-            var from = usersIService.get(getUser());
+                var from = usersIService.get(getUser());
 
-            var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", from.fullName },
                 { "to", to.fullName },
                 {"content",ccm.content }
             });
-            if (to.server != me)
-            {
                 var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
             }
-            //return await homeController.newMessageEntering(new TransferPayload { from=getUser(),to=to.userId,content=ccm.content});
-            FileModel file = null;
+            FileModel? file = null;
             if (ccm.formFile != null)
             {
                 file = new(ccm.formFile);
             }
             messagesIService.addMessage(getUser(), ccm.id, ccm.content, file);
-            /*var m = new Message();
-            m.created = DateTime.Now;
-            m.content = ccm.content;
-            m.fromId = getUser();
-            m.toId = ccm.id;*/
             await chatHub.SendMessage(getUser(), ccm.id, ccm.content);
             return StatusCode(201);
         }

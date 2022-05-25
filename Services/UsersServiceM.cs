@@ -23,15 +23,8 @@ public class UsersServiceM : UsersIService
         return false;
     }
 
-    public void create(string fullName, string nickName, string server, Img img = null, string password = "")
+    public void create(string fullName, string nickName, string server, Img? img = null, string password = "")
     {
-        if (img == null)
-        {
-            string path = Directory.GetCurrentDirectory();
-            var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
-            byte[] bytes = File.ReadAllBytes(picPath);
-            img = new Img(bytes);
-        }
         var user = new User(fullName, server, nickName, password, img);
         if (get(fullName, server) == null)
         {

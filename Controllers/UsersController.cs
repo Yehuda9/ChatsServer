@@ -75,15 +75,8 @@ namespace JWTAuthentication.NET6._0.Controllers
         public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
-            Img proImg = null;
-            if (userInfo.profileImage == null || userInfo.profileImage.Length == 0)
-            {
-                string path = Directory.GetCurrentDirectory();
-                var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
-                byte[] bytes = System.IO.File.ReadAllBytes(picPath);
-                proImg = new Img(bytes);
-            }
-            else
+            Img? proImg = null;
+            if (userInfo.profileImage != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
