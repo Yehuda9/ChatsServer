@@ -69,7 +69,14 @@ public class ContactsController : ControllerBase
                 { "from", from.fullName },
                 { "to", ccp.id },
                 {"server",GetLocalIPAddress() }});
-                var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
+                try
+                {
+                    var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
+                }catch (Exception ex)
+                {
+                    Console.Write(ex.ToString());
+                    //message not sent
+                }
             }
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
@@ -148,7 +155,7 @@ public class ContactsController : ControllerBase
         if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile == null)) { return BadRequest(); }
         try
         {
-            var to = usersIService.getContact(getUser(),ccm.id);
+            var to = usersIService.getContact(getUser(), ccm.id);
             if (to != null && to.server != me)
             {
                 HttpClientHandler clientHandler = new()
@@ -165,7 +172,15 @@ public class ContactsController : ControllerBase
                 { "to", to.fullName },
                 {"content",ccm.content }
             });
-                var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+                try
+                {
+                    var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+                }
+                catch (Exception ex)
+                {
+                    Console.Write(ex.ToString());
+                    //messege not sent
+                }
             }
             FileModel? file = null;
             if (ccm.formFile != null)

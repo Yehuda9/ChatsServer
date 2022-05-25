@@ -62,16 +62,21 @@ public class UsersServiceM : UsersIService
     private void findLastMsg(User user, string contactId)
     {
         var chatId = context.chats.Where(x => (x.user1Id == contactId && x.user2Id == user.userId) || (x.user2Id == contactId && x.user1Id == user.userId)).FirstOrDefault().id;
-        var chat = context.messages.Where(m => m.chatId == chatId);
+        var chat = context.messages.Where(m => m.chatId == chatId).Include(c=>c.formFile);
         var Ochat = chat.OrderBy(m => m.created).ToList();
         if (Ochat.Capacity == 0)
         {
             user.last = "";
             return;
         }
-        var lastMsg = Ochat.Last().content;
-        var lastDate = Ochat.Last().created;
-        user.last = lastMsg != null ? lastMsg : "";
+        var last = Ochat.Last();
+        var lastMsg = last.content;
+        if (last.formFile != null)
+        {
+            user.lastType = last.formFile.contentType;
+        }
+        var lastDate = last.created;
+        user.last = lastMsg ?? "";
         user.lastDate = lastDate;
 
     }

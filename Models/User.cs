@@ -16,6 +16,8 @@ public class User
     public string nickName { get; set; }
     public string server { get; set; }
     public string last { get; set; }
+    public string lastType { get; set; }
+
     public DateTime lastDate { get; set; }
     public List<Chat> userMessages { get; set; }
     /* [ForeignKey("profileImg")]
