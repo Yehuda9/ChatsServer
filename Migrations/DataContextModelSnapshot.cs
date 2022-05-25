@@ -49,6 +49,32 @@ namespace Chats.Migrations
                     b.ToTable("ChatUser");
                 });
 
+            modelBuilder.Entity("FileModel", b =>
+                {
+                    b.Property<string>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("contentType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("data")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<long>("length")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("id");
+
+                    b.ToTable("FileModel");
+                });
+
             modelBuilder.Entity("Img", b =>
                 {
                     b.Property<string>("id")
@@ -79,6 +105,9 @@ namespace Chats.Migrations
                     b.Property<DateTime>("created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("formFileid")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("fromId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -93,6 +122,8 @@ namespace Chats.Migrations
                     b.HasKey("MessageId");
 
                     b.HasIndex("chatId");
+
+                    b.HasIndex("formFileid");
 
                     b.ToTable("messages");
                 });
@@ -157,6 +188,12 @@ namespace Chats.Migrations
                         .HasForeignKey("chatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FileModel", "formFile")
+                        .WithMany()
+                        .HasForeignKey("formFileid");
+
+                    b.Navigation("formFile");
                 });
 
             modelBuilder.Entity("User", b =>

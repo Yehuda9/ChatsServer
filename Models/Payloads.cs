@@ -5,7 +5,9 @@ public class TransferPayload
 {
     public string from { get; set; }
     public string to { get; set; }
-    public string content { get; set; }
+    public string? content { get; set; }
+    public IFormFile? formFile { get; set; }
+
 }
 public class InvitationsPayLoad
 {
@@ -18,9 +20,6 @@ public class RegisterPayLoad
     public string name { get; set; }
     public string nickName { get; set; }
     public string password { get; set; }
-    //[ModelBinder(BinderType = typeof(ByteArrayModelBinder))]
-    /*[ModelBinder(Name = "profileImage")]
-    public byte[] profileImage { get; set; }*/
     public IFormFile? profileImage { get; set; } 
 }
 
@@ -33,7 +32,8 @@ public class LoginPayLoad
 public class CreateContactMessagePayLoad
 {
     public string id { get; set; }
-    public string content { get; set; }
+    public string? content { get; set; }
+    public IFormFile? formFile { get; set; }
 }
 
 public class CreateContactPayLoad

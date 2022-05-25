@@ -10,7 +10,7 @@ public class DataContext : DbContext
 
 
     //private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=";
-    public DataContext()
+    public DataContext():base()
     {
         this.ChangeTracker.LazyLoadingEnabled = false;
     }

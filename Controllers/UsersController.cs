@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Web.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -27,6 +26,23 @@ namespace JWTAuthentication.NET6._0.Controllers
             this.chatHub = chatHub;
         }
 
+        [HttpGet]
+        [Route("userExists")]
+        public ActionResult<bool> userExists(string name)
+        {
+            return usersService.get(name, me) != null;
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("getUser")]
+        public ActionResult<string> getUser()
+        {
+            string? name = this.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
+            if (name == null) { return NotFound(); }
+            User? user = usersService.get(name, me);
+            if (user == null) { return NotFound(); }
+            return Ok(user);
+        }
         [HttpPost]
         [Route("login")]
         public IActionResult login([FromForm] LoginPayLoad userInfo)
@@ -59,23 +75,19 @@ namespace JWTAuthentication.NET6._0.Controllers
         public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
-            Img proImg = null;
-            if (userInfo.profileImage == null || userInfo.profileImage.Length == 0)
+            FileModel? proImg = null;
+            if (userInfo.profileImage != null)
             {
-                byte[] bytes = System.IO.File.ReadAllBytes("C:\\Users\\yehud\\Desktop\\ChatsServer\\wwwroot\\generic_profile_image.png");
-                proImg = new Img(bytes);
-            }
-            else
-            {
-                using (var memoryStream = new MemoryStream())
+                proImg = new(userInfo.profileImage);
+                /*using (var memoryStream = new MemoryStream())
                 {
                     await userInfo.profileImage.CopyToAsync(memoryStream);
-                    proImg = new Img(memoryStream.ToArray());
-                }
+                    proImg = new FileModel(memoryStream.ToArray());
+                }*/
             }
             var userExists = usersService.get(userInfo.name, me);
             if (userExists != null) return Unauthorized("User already exists!");
-            usersService.create(userInfo.name, userInfo.nickName, me, proImg, userInfo.password);
+            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.profileImage, userInfo.password);
             var loginPayLoad = new LoginPayLoad
             {
                 name = userInfo.name,

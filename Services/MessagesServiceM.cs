@@ -1,11 +1,13 @@
-﻿public class MessagesServiceM : MessagesIService
+﻿using Microsoft.EntityFrameworkCore;
+
+public class MessagesServiceM : MessagesIService
 {
     DataContext context = new();
 
-    public void addMessage(string from, string to, string content)
+    public void addMessage(string from, string to, string? content, FileModel? fileModel = null)
     {
         var chat = context.chats.Where(c => (c.user1Id == from && c.user2Id == to) || (c.user1Id == to && c.user2Id == from)).First();
-        context.messages.Add(new Message(from, to, content, chat.id));
+        context.messages.Add(new Message(from, to, content, chat.id,fileModel));
         context.SaveChanges();
     }
 
@@ -24,7 +26,7 @@
 
     public List<Message> getMessages(string user, string contact)
     {
-        return context.messages.Where(c => (c.fromId == user && c.toId == contact) || (c.fromId == contact && c.toId == user)).ToList();
+        return context.messages.Include(m=>m.formFile).Where(c => (c.fromId == user && c.toId == contact) || (c.fromId == contact && c.toId == user)).ToList();
     }
 
     public void updateMessage(string user, string contact, string msg, string content)
@@ -36,6 +38,8 @@
     {
         var chats = context.chats;
         var userChats = chats.Where(x => x.user1Id == userId || x.user2Id == userId).ToList();
+        //return userChats.Find((c) => (c.user1Id == contactName || c.user2Id == contactName));
+
         return userChats.Find((c) => (c.user1Id.Split(",")[0] == contactName || c.user2Id.Split(",")[0] == contactName));
     }
 }

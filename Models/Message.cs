@@ -8,6 +8,7 @@ public class Message
     public string MessageId { get; set; }
     public DateTime created { get; set; }
     public string? content { get; set; }
+    public FileModel? formFile { get; set; }
     public bool sent { get; set; }
     public string fromId { get; set; }
     public string toId { get; set; }
@@ -16,7 +17,7 @@ public class Message
     {
 
     }
-    public Message(string from, string to, string content, string chatId)
+    public Message(string from, string to, string content, string chatId, FileModel? formFile=null)
     {
         fromId = from;
         toId = to;
@@ -25,6 +26,7 @@ public class Message
         MessageId = from + "," + to + "," + created + "," + content;
         sent = false;
         this.chatId = chatId;
+        this.formFile = formFile;
     }
 }
 
