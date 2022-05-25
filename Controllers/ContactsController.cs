@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 
 [Authorize]
@@ -20,7 +22,18 @@ public class ContactsController : ControllerBase
         messagesIService = mis;
         this.chatHub = chatHub;
     }
-
+    private string GetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.ToString() + ":" + HttpContext.Request.Host.Port;
+            }
+        }
+        throw new Exception("No network adapters with an IPv4 address in the system!");
+    }
     [HttpGet]
     public ActionResult<string> getAllContacts()
     {
@@ -33,14 +46,31 @@ public class ContactsController : ControllerBase
             return NotFound();
         }
     }
+
     [HttpPost]
     public async Task<IActionResult> createContact([FromForm] CreateContactPayLoad ccp)
     {
-        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null) { 
+        if (ccp == null || ccp.id == null | ccp.name == null || ccp.server == null)
+        {
             return BadRequest();
         }
         try
         {
+            if (ccp.server != me)
+            {
+                HttpClientHandler clientHandler = new()
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+
+                HttpClient client = new(clientHandler);
+                var from = usersIService.get(getUser());
+                var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                { "from", from.fullName },
+                { "to", ccp.id },
+                {"server",GetLocalIPAddress() }});
+                var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
+            }
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
@@ -114,15 +144,34 @@ public class ContactsController : ControllerBase
     [Route("{id}/messages")]
     public async Task<IActionResult> createContactMessage([FromForm] CreateContactMessagePayLoad ccm)
     {
-        if (ccm == null || ccm.id == null || ccm.content == null) { return BadRequest(); }
+        if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile == null)) { return BadRequest(); }
         try
         {
-            messagesIService.addMessage(getUser(), ccm.id, ccm.content);
-            /*var m = new Message();
-            m.created = DateTime.Now;
-            m.content = ccm.content;
-            m.fromId = getUser();
-            m.toId = ccm.id;*/
+            var to = usersIService.get(ccm.id,me);
+            if (to !=null && to.server != me)
+            {
+                HttpClientHandler clientHandler = new()
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+
+                HttpClient client = new(clientHandler);
+
+                var from = usersIService.get(getUser());
+
+                var content = new FormUrlEncodedContent(new Dictionary<string, string> {
+                { "from", from.fullName },
+                { "to", to.fullName },
+                {"content",ccm.content }
+            });
+                var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
+            }
+            FileModel? file = null;
+            if (ccm.formFile != null)
+            {
+                file = new(ccm.formFile);
+            }
+            messagesIService.addMessage(getUser(), ccm.id, ccm.content, file);
             await chatHub.SendMessage(getUser(), ccm.id, ccm.content);
             return StatusCode(201);
         }

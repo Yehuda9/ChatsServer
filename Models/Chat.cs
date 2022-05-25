@@ -13,7 +13,7 @@ public class Chat
         user2Id = id2;
         users = new List<User>();
         messages = new List<Message>();
-        id = user1Id + ":" + user2Id;
+        id = user1Id + "^" + user2Id;
     }
 }
 

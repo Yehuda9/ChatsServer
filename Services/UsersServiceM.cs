@@ -23,10 +23,10 @@ public class UsersServiceM : UsersIService
         return false;
     }
 
-    public void create(string fullName, string nickName, string server, Img img=null, string password = "")
+    public void create(string fullName, string nickName, string server, IFormFile? img = null, string password = "")
     {
-        var user = new User(fullName, server, nickName, password,img);
-        if (get(fullName,server)==null)
+        var user = new User(fullName, server, nickName, password, img);
+        if (get(fullName, server) == null)
         {
             context.Add(user);
             context.SaveChanges();
@@ -47,9 +47,9 @@ public class UsersServiceM : UsersIService
 
     public User? get(string userId, string server)
     {
-        return context.users.Include(u=>u.profileImg).Where(u=>u.userId==(userId + "," + server)).FirstOrDefault();
+        return context.users.Include(u => u.profileImg).Where(u => u.userId == (userId + "," + server)).FirstOrDefault();
     }
-    private User? get(string userId)
+    public User? get(string userId)
     {
         return context.users.Include(u => u.profileImg).Where(u => u.userId == userId).FirstOrDefault();
     }
@@ -95,6 +95,7 @@ public class UsersServiceM : UsersIService
                 result.Add(contact);
             }
         }
+        result = result.OrderBy(u => u.lastDate).Reverse().ToList();
         return result;
     }
 
@@ -106,7 +107,10 @@ public class UsersServiceM : UsersIService
     public void removeContact(string id, string contactId)
     {
         var chat = getChatByIds(id, contactId);
-        context.chats.Remove(chat);
+        if (chat != null)
+        {
+            context.chats.Remove(chat);
+        }
     }
 
     public void update(string id, string name, string password, string server = "")

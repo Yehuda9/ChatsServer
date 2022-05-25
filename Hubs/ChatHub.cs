@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 [Authorize]
 public class ChatHub : Hub
 {
-    public readonly static Dictionary<string,string> idToConnection=new();
+    public readonly static Dictionary<string, string> idToConnection = new();
 
     public override Task OnConnectedAsync()
     {
@@ -18,6 +18,7 @@ public class ChatHub : Hub
         string? name = getName();
         var ConnectionID = Context.ConnectionId;
         idToConnection[name] = ConnectionID;
+        Groups.AddToGroupAsync(ConnectionID, name);
         return base.OnConnectedAsync();
     }
     private string? getName()
@@ -25,10 +26,12 @@ public class ChatHub : Hub
         return Context.User.Claims.SingleOrDefault(x => x.Type.EndsWith("name"))?.Value;
     }
 
-    public async Task SendMessage(string from,string to,string message)
+    public async Task SendMessage(string from, string to, string? message)
     {
         if (!idToConnection.ContainsKey(to.Split(',')[0])) { return; }
-        await Clients.Clients(idToConnection[to.Split(',')[0]]).SendAsync("ReceiveMessage" , from, to, message);
+        await Clients.Group(to.Split(',')[0]).SendAsync("ReceiveMessage", from, to, message);
+
+        //await Clients.Clients(idToConnection[to.Split(',')[0]]).SendAsync("ReceiveMessage" , from, to, message);
     }
 }
 
