@@ -36,6 +36,7 @@ public class User
         this.server = server;
         this.userMessages = new List<Chat>();
         last = "";
+        lastType = "text";
         lastDate = DateTime.Now;
         if (proImg != null && proImg.ContentType == "image/jpeg")
         {
