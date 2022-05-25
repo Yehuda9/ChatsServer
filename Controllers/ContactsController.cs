@@ -148,7 +148,7 @@ public class ContactsController : ControllerBase
         if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile == null)) { return BadRequest(); }
         try
         {
-            var to = usersIService.get(ccm.id, me);
+            var to = usersIService.getContact(getUser(),ccm.id);
             if (to != null && to.server != me)
             {
                 HttpClientHandler clientHandler = new()
