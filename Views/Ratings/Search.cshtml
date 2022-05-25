@@ -1,0 +1,56 @@
+﻿@model List<RatingClass>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div id="login_bg">
+    <div id="login_register_wrapper">
+        <div id='login_window'>
+            <div id="side_window">
+                <h1>Search Comment</h1>
+                <br />
+                <h4>Searched for: ?</h4>
+                <div id="avg-rate-wrapper">
+                    
+                </div>
+                <div class="links">
+                <a asp-action="Create">Create New</a>
+                <br />
+                <a asp-action="Index">Back to List</a>
+                </div>
+            </div>
+            <div class="right-side">
+                <form asp-action="Search">
+                    <input id="search-input" name="searchText"/>
+                    <input id="search" type="submit" value="Search" onkeyup="Search" />    
+                </form>
+                <div id="cards">
+                    @foreach (var item in Model) {
+                    <div class="card">
+                        <div class="card-header">
+                            Rating:
+                            <h2>@Html.DisplayFor(modelItem => item.Rating)</h2>
+                        </div>
+                        <div class="card-body">
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </div>
+                        <div class="card-footer">
+                            <small>By <strong>@Html.DisplayFor(modelItem => item.Composer)</strong></small>
+                            <small>Last modified <strong> Jun 16, 2017</strong></small>
+                            <span>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </span>
+                        
+                        </div>
+                    </div>
+                    }
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+                        

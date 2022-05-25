@@ -6,8 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Rating_page.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
+
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 
 // Add services to the container.
@@ -78,5 +84,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chatHub");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Ratings}/{action=Index}/");
 
 app.Run();

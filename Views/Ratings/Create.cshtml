@@ -1,0 +1,52 @@
+﻿@model Rating_page.Models.RatingClass
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div id="login_bg">
+    <div id="login_register_wrapper">
+        <div id='login_window'>
+            <div id="side_window">
+                <h1>Create New Comment</h1>
+                <br />
+                <div id="avg-rate-wrapper">
+                    <a asp-action="Index">Back to List</a>
+                </div>
+            </div>
+            <div class="right-side" id="rs-form">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Composer" class="control-label"></label>
+                        <input asp-for="Composer" class="form-control" />
+                        <span asp-validation-for="Composer" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Rating" class="control-label"></label>
+                        <input asp-for="Rating" class="form-control" />
+                        <span asp-validation-for="Rating" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
