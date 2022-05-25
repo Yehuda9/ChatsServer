@@ -133,7 +133,7 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            var to = usersIService.get(id, me);
+            var to = usersIService.getContact(getUser(), id);
             return Ok(messagesIService.getMessages(getUser(), to.userId));
         }
         catch (Exception ex)

@@ -101,7 +101,7 @@ public class UsersServiceM : UsersIService
 
     public User? getContact(string id, string contactId)
     {
-        return getAllContacts(id).Find(usr => usr.userId == contactId);
+        return getAllContacts(id).Find(usr => usr.userId == contactId || usr.fullName == contactId);
     }
 
     public void removeContact(string id, string contactId)
