@@ -75,18 +75,19 @@ namespace JWTAuthentication.NET6._0.Controllers
         public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
-            Img? proImg = null;
+            FileModel? proImg = null;
             if (userInfo.profileImage != null)
             {
-                using (var memoryStream = new MemoryStream())
+                proImg = new(userInfo.profileImage);
+                /*using (var memoryStream = new MemoryStream())
                 {
                     await userInfo.profileImage.CopyToAsync(memoryStream);
-                    proImg = new Img(memoryStream.ToArray());
-                }
+                    proImg = new FileModel(memoryStream.ToArray());
+                }*/
             }
             var userExists = usersService.get(userInfo.name, me);
             if (userExists != null) return Unauthorized("User already exists!");
-            usersService.create(userInfo.name, userInfo.nickName, me, proImg, userInfo.password);
+            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.profileImage, userInfo.password);
             var loginPayLoad = new LoginPayLoad
             {
                 name = userInfo.name,

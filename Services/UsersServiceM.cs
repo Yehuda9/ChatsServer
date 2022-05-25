@@ -23,7 +23,7 @@ public class UsersServiceM : UsersIService
         return false;
     }
 
-    public void create(string fullName, string nickName, string server, Img? img = null, string password = "")
+    public void create(string fullName, string nickName, string server, IFormFile? img = null, string password = "")
     {
         var user = new User(fullName, server, nickName, password, img);
         if (get(fullName, server) == null)
@@ -107,7 +107,10 @@ public class UsersServiceM : UsersIService
     public void removeContact(string id, string contactId)
     {
         var chat = getChatByIds(id, contactId);
-        context.chats.Remove(chat);
+        if (chat != null)
+        {
+            context.chats.Remove(chat);
+        }
     }
 
     public void update(string id, string name, string password, string server = "")

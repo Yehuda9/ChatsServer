@@ -20,12 +20,12 @@ public class User
     public List<Chat> userMessages { get; set; }
     /* [ForeignKey("profileImg")]
      public string profileImgId { get; set; }*/
-    public Img profileImg { get; set; }
+    public FileModel profileImg { get; set; }
     public User()
     {
         this.userMessages = new List<Chat>();
     }
-    public User(string fullName, string server, string nickName, string password = "", Img? proImg = null)
+    public User(string fullName, string server, string nickName, string password = "", IFormFile? proImg = null)
     {
         this.userId = fullName + "," + server;
         this.fullName = fullName;
@@ -35,16 +35,16 @@ public class User
         this.userMessages = new List<Chat>();
         last = "";
         lastDate = DateTime.Now;
-        if (profileImg != null)
+        if (proImg != null && proImg.ContentType == "image/jpeg")
         {
-            this.profileImg = proImg;
+            this.profileImg = new(proImg);
         }
         else
         {
             string path = Directory.GetCurrentDirectory();
             var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
             byte[] bytes = File.ReadAllBytes(picPath);
-            this.profileImg = new Img(bytes);
+            this.profileImg = new FileModel(bytes,"profileImage", "image/jpeg");
         }
     }
     public bool chackPassword(string pass)

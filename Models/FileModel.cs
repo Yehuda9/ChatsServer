@@ -22,4 +22,11 @@ public class FileModel
         this.contentType = file.ContentType;
         this.name = file.FileName;
     }
+    public FileModel(byte[] bytes,string name,string type)
+    {
+        data= bytes;
+        this.contentType = type;
+        this.name = name;
+        length= bytes.Length;
+    }
 }
