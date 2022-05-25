@@ -11,29 +11,20 @@ using System.Text.Json;
 public class ContactsController : ControllerBase
 {
     private readonly ChatHub chatHub;
-
+    private readonly IConfiguration _configuration;
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
-    private readonly static string me = "me";
+    private readonly string me;
 
-    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, IConfiguration configuration)
     {
+        _configuration = configuration;
         usersIService = uis;
         messagesIService = mis;
         this.chatHub = chatHub;
+        me = _configuration["myLocalIpv4"] + ":" + _configuration["myPort"];
     }
-    private string GetLocalIPAddress()
-    {
-        var host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (var ip in host.AddressList)
-        {
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-            {
-                return ip.ToString() + ":" + HttpContext.Request.Host.Port;
-            }
-        }
-        throw new Exception("No network adapters with an IPv4 address in the system!");
-    }
+
     [HttpGet]
     public ActionResult<string> getAllContacts()
     {
@@ -68,13 +59,22 @@ public class ContactsController : ControllerBase
                 var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", from.fullName },
                 { "to", ccp.id },
-                {"server",GetLocalIPAddress() }});
+                {"server", me}});
                 try
                 {
                     var response = await client.PostAsync("https://" + ccp.server + "/api/invitations", content);
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.Write(ex.ToString());
+                    try
+                    {
+                        var response = await client.PostAsync("http://" + ccp.server + "/api/invitations", content);
+                    }
+                    catch
+                    {
+                        Console.Write(ex.ToString());
+                    }
                     //message not sent
                 }
             }
@@ -170,8 +170,7 @@ public class ContactsController : ControllerBase
                 var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", from.fullName },
                 { "to", to.fullName },
-                {"content",ccm.content }
-            });
+                {"content",ccm.content }});
                 try
                 {
                     var response = await client.PostAsync("https://" + to.server + "/api/transfer", content);
@@ -179,6 +178,15 @@ public class ContactsController : ControllerBase
                 catch (Exception ex)
                 {
                     Console.Write(ex.ToString());
+                    try
+                    {
+                        var response = await client.PostAsync("http://" + to.server + "/api/transfer", content);
+
+                    }
+                    catch
+                    {
+                        Console.Write(ex.ToString());
+                    }
                     //messege not sent
                 }
             }
@@ -218,6 +226,20 @@ public class ContactsController : ControllerBase
         {
             messagesIService.updateMessage(getUser(), id, id2, content);
             await chatHub.SendMessage(getUser(), id, id2);
+            return StatusCode(204);
+        }
+        catch (Exception ex)
+        {
+            return NotFound();
+        }
+    }
+    [HttpDelete]
+    [Route("{id}/messages/{id2}")]
+    public ActionResult<string> deleteContactMessage(string id, string id2, string msgId)
+    {
+        try
+        {
+            messagesIService.deleteMessage(id, id2, msgId);
             return StatusCode(204);
         }
         catch (Exception ex)

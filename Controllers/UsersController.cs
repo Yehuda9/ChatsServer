@@ -7,23 +7,26 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
+using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using BC = BCrypt.Net.BCrypt;
 namespace JWTAuthentication.NET6._0.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ChatHub chatHub;
         private readonly UsersIService? usersService;
         private readonly IConfiguration _configuration;
-        private readonly static string me = "me";
+        private readonly string me;
 
-        public UsersController(IConfiguration configuration, UsersIService usersIService, ChatHub chatHub)
+        public UsersController(IConfiguration configuration, UsersIService usersIService)
         {
             usersService = usersIService;
             _configuration = configuration;
-            this.chatHub = chatHub;
+            me = _configuration["myLocalIpv4"] + ":" + _configuration["myPort"];
+
         }
 
         [HttpGet]
@@ -48,6 +51,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         public IActionResult login([FromForm] LoginPayLoad userInfo)
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null) { return BadRequest(); }
+
             var user = usersService.get(userInfo.name, me);
 
             if (user != null && usersService.checkPassword(user, userInfo.password))
@@ -75,19 +79,15 @@ namespace JWTAuthentication.NET6._0.Controllers
         public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
-            FileModel? proImg = null;
-            if (userInfo.profileImage != null)
+            if (userInfo.password.Length < 5 || Regex.Matches(userInfo.password, @"[a-zA-Z]").ToArray().Length == 0 || Regex.Matches(userInfo.password, @"[0-9]").ToArray().Length == 0)
             {
-                proImg = new(userInfo.profileImage);
-                /*using (var memoryStream = new MemoryStream())
-                {
-                    await userInfo.profileImage.CopyToAsync(memoryStream);
-                    proImg = new FileModel(memoryStream.ToArray());
-                }*/
+                return BadRequest();
             }
             var userExists = usersService.get(userInfo.name, me);
             if (userExists != null) return Unauthorized("User already exists!");
-            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.profileImage, userInfo.password);
+            var passwordHash = BC.HashPassword(userInfo.password);
+            //Console.WriteLine(BC.Verify(userInfo.password, passwordHash));
+            usersService.create(userInfo.name, userInfo.nickName, me, userInfo.profileImage, passwordHash);
             var loginPayLoad = new LoginPayLoad
             {
                 name = userInfo.name,

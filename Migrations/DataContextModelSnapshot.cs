@@ -126,7 +126,7 @@ namespace Chats.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("lastDate")
+                    b.Property<DateTime?>("lastDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("lastType")

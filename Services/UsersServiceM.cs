@@ -33,10 +33,9 @@ public class UsersServiceM : UsersIService
         }
     }
 
-
     public void delete(string userId, string server)
     {
-        User? user = context.users.Find(userId + "," + server);
+        User? user = context.users.Find(userId + "*" + server);
         if (user != null)
         {
             context.Remove(user);
@@ -47,7 +46,7 @@ public class UsersServiceM : UsersIService
 
     public User? get(string userId, string server)
     {
-        return context.users.Include(u => u.profileImg).Where(u => u.userId == (userId + "," + server)).FirstOrDefault();
+        return context.users.Include(u => u.profileImg).Where(u => u.userId == (userId + "*" + server)).FirstOrDefault();
     }
     public User? get(string userId)
     {
@@ -67,6 +66,7 @@ public class UsersServiceM : UsersIService
         if (Ochat.Capacity == 0)
         {
             user.last = "";
+            user.lastDate = DateTime.Now;
             return;
         }
         var last = Ochat.Last();
@@ -127,7 +127,6 @@ public class UsersServiceM : UsersIService
             user.password = password;
         }
         context.SaveChanges();
-
     }
 }
 

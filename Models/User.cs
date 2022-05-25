@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using BC = BCrypt.Net.BCrypt;
 
 public class User
 {
@@ -17,8 +18,7 @@ public class User
     public string server { get; set; }
     public string last { get; set; }
     public string lastType { get; set; }
-
-    public DateTime lastDate { get; set; }
+    public DateTime? lastDate { get; set; }
     public List<Chat> userMessages { get; set; }
     /* [ForeignKey("profileImg")]
      public string profileImgId { get; set; }*/
@@ -29,7 +29,7 @@ public class User
     }
     public User(string fullName, string server, string nickName, string password = "", IFormFile? proImg = null)
     {
-        this.userId = fullName + "," + server;
+        this.userId = fullName + "*" + server;
         this.fullName = fullName;
         this.password = password;
         this.nickName = nickName;
@@ -37,7 +37,7 @@ public class User
         this.userMessages = new List<Chat>();
         last = "";
         lastType = "text";
-        lastDate = DateTime.Now;
+        lastDate = null;
         if (proImg != null && proImg.ContentType == "image/jpeg")
         {
             this.profileImg = new(proImg);
@@ -53,7 +53,8 @@ public class User
     public bool chackPassword(string pass)
     {
         if (pass == null || this.password == "") return false;
-        return password == pass;
+        return BC.Verify(pass, this.password);
+        //return password == pass;
     }
 }
 

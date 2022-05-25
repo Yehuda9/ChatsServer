@@ -26,6 +26,7 @@ builder.Services.AddScoped<UsersIService, UsersServiceM>();
 builder.Services.AddSingleton<IUserIdProvider, MyProvider>();
 //builder.Services.AddScoped<Hub, ChatHub>();
 builder.Services.AddSingleton<ChatHub>();
+builder.Services.AddSingleton<DataContext>();
 builder.Services.AddMvc().AddControllersAsServices();
 
 builder.Services.AddSignalR();

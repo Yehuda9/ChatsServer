@@ -8,7 +8,6 @@ public class DataContext : DbContext
     public DbSet<Chat> chats { get; set; }
     public DbSet<Message> messages { get; set; }
 
-
     //private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=";
     public DataContext():base()
     {
