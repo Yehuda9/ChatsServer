@@ -133,7 +133,8 @@ public class ContactsController : ControllerBase
     {
         try
         {
-            return Ok(messagesIService.getMessages(getUser(), id));
+            var to = usersIService.get(id, me);
+            return Ok(messagesIService.getMessages(getUser(), to.userId));
         }
         catch (Exception ex)
         {
@@ -147,8 +148,8 @@ public class ContactsController : ControllerBase
         if (ccm == null || ccm.id == null || (ccm.content == null && ccm.formFile == null)) { return BadRequest(); }
         try
         {
-            var to = usersIService.get(ccm.id,me);
-            if (to !=null && to.server != me)
+            var to = usersIService.get(ccm.id, me);
+            if (to != null && to.server != me)
             {
                 HttpClientHandler clientHandler = new()
                 {
@@ -171,8 +172,8 @@ public class ContactsController : ControllerBase
             {
                 file = new(ccm.formFile);
             }
-            messagesIService.addMessage(getUser(), ccm.id, ccm.content, file);
-            await chatHub.SendMessage(getUser(), ccm.id, ccm.content);
+            messagesIService.addMessage(getUser(), to.userId, ccm.content, file);
+            await chatHub.SendMessage(getUser(), to.userId, ccm.content);
             return StatusCode(201);
         }
         catch (Exception ex)

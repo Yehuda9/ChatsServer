@@ -23,8 +23,8 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        /*modelBuilder.Entity<Img>().Property(i => i.image);
-        modelBuilder.Entity<User>().Property(u=>u.profileImg);*/
+        /*modelBuilder.Entity<Img>().Property(i => i.image);*/
+        //modelBuilder.Entity<User>().Property(u=>u.profileImg);
         modelBuilder.Entity<Message>().Property(e => e.MessageId).ValueGeneratedOnAdd();
     }
 

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public class FileModel
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string id { get; set; }  
     public string name { get; set; }
     public byte[] data { get; set; }
@@ -15,6 +14,8 @@ public class FileModel
     }
     public FileModel(IFormFile file)
     {
+        id = new Random().Next().ToString();
+
         this.length = file.Length;
         var stream = new MemoryStream((int) length);
         file.CopyTo(stream);
@@ -24,7 +25,9 @@ public class FileModel
     }
     public FileModel(byte[] bytes,string name,string type)
     {
-        data= bytes;
+        id = new Random().Next().ToString();
+
+        data = bytes;
         this.contentType = type;
         this.name = name;
         length= bytes.Length;
