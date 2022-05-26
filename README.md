@@ -8,3 +8,16 @@ How to set server ip:port to '1.2.3.4:1234':
 and change "ValidAudience" to "http://1.2.3.4:4200" and "ValidIssuer" "http://1.2.3.4:5000" 
 
 
+Dependencies:
+
+- .nuget\packages\bcrypt.net-next\4.0.3\
+- .nuget\packages\microsoft.aspnetcore.authentication.jwtbearer\6.0.5\
+- .nuget\packages\microsoft.aspnetcore.identity.entityframeworkcore\6.0.5\
+- .nuget\packages\microsoft.aspnetcore.spaservices\3.1.25\
+- .nuget\packages\microsoft.aspnetcore.spaservices.extensions\6.0.5\
+- .nuget\packages\microsoft.entityframeworkcore.sqlite\6.0.5\
+- .nuget\packages\microsoft.entityframeworkcore.sqlserver\6.0.5\
+- .nuget\packages\microsoft.entityframeworkcore.tools\6.0.5\
+- .nuget\packages\microsoft.visualstudio.web.codegeneration.design\6.0.4\
+- .nuget\packages\pomelo.entityframeworkcore.mysql\6.0.1\
+- .nuget\packages\swashbuckle.aspnetcore\6.3.1\
