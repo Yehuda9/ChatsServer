@@ -20,8 +20,8 @@ public class HomeController : ControllerBase
     }
 
     [HttpPost]
-    [Route("invitations")]
-    public async Task<IActionResult> addConversation([FromForm] InvitationsPayLoad inv)
+    [Route("/api/invitations")]
+    public async Task<IActionResult> addConversation([FromBody] InvitationsPayLoad inv)
     {
         if (inv == null || inv.from == null || inv.to == null || inv.server == null) { return BadRequest(); }
         usersService.create(inv.from, inv.from, inv.server);
@@ -33,8 +33,8 @@ public class HomeController : ControllerBase
     }
 
     [HttpPost]
-    [Route("transfer")]
-    public async Task<IActionResult> newMessageEntering([FromForm] TransferPayload msg)
+    [Route("/api/transfer")]
+    public async Task<IActionResult> newMessageEntering([FromBody] TransferPayload msg)
     {
         if (msg == null || msg.from == null || msg.to == null || (msg.content == null && msg.formFile == null)) { return BadRequest(); }
 
