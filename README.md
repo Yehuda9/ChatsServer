@@ -1,3 +1,4 @@
+## NOTE: This backend repo contains frontend parts (compiled react project) which are NOT relevant to the backend. Please ignore the wwwroot folder and the app-frontend it contains. The frontend part of the project is in repo "ex1" which is also submitted in the submition text file.
 # ChatsServer
 
 How to set server ip:port to '1.2.3.4:1234':
