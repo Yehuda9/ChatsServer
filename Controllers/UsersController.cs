@@ -56,7 +56,10 @@ namespace JWTAuthentication.NET6._0.Controllers
 
             if (user != null && usersService.checkPassword(user, userInfo.password))
             {
-
+                if(userInfo.androidToken != null)
+                {
+                    user.androidToken = userInfo.androidToken;
+                }
                 var authClaims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

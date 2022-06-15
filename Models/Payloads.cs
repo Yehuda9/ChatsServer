@@ -20,13 +20,14 @@ public class RegisterPayLoad
     public string name { get; set; }
     public string nickName { get; set; }
     public string password { get; set; }
-    public IFormFile? profileImage { get; set; } 
+    public IFormFile? profileImage { get; set; }
 }
 
 public class LoginPayLoad
 {
     public string name { get; set; }
     public string password { get; set; }
+    public string? androidToken { get; set; }
 }
 
 public class CreateContactMessagePayLoad

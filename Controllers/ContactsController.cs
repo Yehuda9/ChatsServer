@@ -10,6 +10,7 @@ using System.Text.Json;
 [ApiController]
 public class ContactsController : ControllerBase
 {
+    private readonly INotificationService notificationService;
     private readonly ChatHub chatHub;
     private readonly IConfiguration _configuration;
     private readonly UsersIService? usersIService;
@@ -82,6 +83,8 @@ public class ContactsController : ControllerBase
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
             await chatHub.SendMessage(getUser(), u.userId, ccp.server);
+            await notificationService.SendNotification(notification);
+
             return StatusCode(201);
         }
         catch (Exception ex)
@@ -196,6 +199,10 @@ public class ContactsController : ControllerBase
                 file = new(ccm.formFile);
             }
             messagesIService.addMessage(getUser(), to.userId, ccm.content, file);
+            if (to.androidToken != null)
+            {
+                NotificationModel notification = new NotificationModel() { DeviceId = to.androidToken, IsAndroiodDevice = true, Title = getUser(), Body = ccm.content };
+            }
             await chatHub.SendMessage(getUser(), to.userId, ccm.content);
             return StatusCode(201);
         }

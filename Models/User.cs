@@ -23,6 +23,7 @@ public class User
     /* [ForeignKey("profileImg")]
      public string profileImgId { get; set; }*/
     public FileModel profileImg { get; set; }
+    public string? androidToken { get; set; }
     public User()
     {
         this.userMessages = new List<Chat>();
@@ -47,7 +48,7 @@ public class User
             string path = Directory.GetCurrentDirectory();
             var picPath = Path.Join(path, "wwwroot\\generic_profile_image.png");
             byte[] bytes = File.ReadAllBytes(picPath);
-            this.profileImg = new FileModel(bytes,"profileImage", "image/jpeg");
+            this.profileImg = new FileModel(bytes, "profileImage", "image/jpeg");
         }
     }
     public bool chackPassword(string pass)

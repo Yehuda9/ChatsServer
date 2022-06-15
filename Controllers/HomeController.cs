@@ -55,6 +55,7 @@ public class HomeController : ControllerBase
         m.fromId = fromId;
         m.toId = to.userId;
         */
+
         await chatHub.SendMessage(fromId, to.userId, msg.content);
         return StatusCode(201);
     }

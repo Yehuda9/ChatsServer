@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Rating_page.Models;
+using CorePush.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -24,6 +25,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<MessagesIService, MessagesServiceM>();
 builder.Services.AddScoped<UsersIService, UsersServiceM>();
 builder.Services.AddSingleton<IUserIdProvider, MyProvider>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddHttpClient<FcmSender>();
+var appSettingsSection = configuration.GetSection("FcmNotification");
+builder.Services.Configure<FcmNotificationSetting>(appSettingsSection);
 //builder.Services.AddScoped<Hub, ChatHub>();
 builder.Services.AddSingleton<ChatHub>();
 builder.Services.AddSingleton<DataContext>();
