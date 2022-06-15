@@ -78,6 +78,7 @@ namespace JWTAuthentication.NET6._0.Controllers
         [Route("register")]
         public async Task<IActionResult> register([FromForm] RegisterPayLoad userInfo)
         {
+            
             if (userInfo == null || userInfo.name == null || userInfo.password == null || userInfo.nickName == null) { return BadRequest(); }
             if (userInfo.password.Length < 5 || Regex.Matches(userInfo.password, @"[a-zA-Z]").ToArray().Length == 0 || Regex.Matches(userInfo.password, @"[0-9]").ToArray().Length == 0)
             {
