@@ -17,9 +17,10 @@ public class ContactsController : ControllerBase
     private readonly MessagesIService? messagesIService;
     private readonly string me;
 
-    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, IConfiguration configuration)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, INotificationService ns, IConfiguration configuration)
     {
         _configuration = configuration;
+        notificationService = ns;
         usersIService = uis;
         messagesIService = mis;
         this.chatHub = chatHub;
@@ -83,8 +84,6 @@ public class ContactsController : ControllerBase
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
             await chatHub.SendMessage(getUser(), u.userId, ccp.server);
-            await notificationService.SendNotification(notification);
-
             return StatusCode(201);
         }
         catch (Exception ex)
@@ -202,6 +201,8 @@ public class ContactsController : ControllerBase
             if (to.androidToken != null)
             {
                 NotificationModel notification = new NotificationModel() { DeviceId = to.androidToken, IsAndroiodDevice = true, Title = getUser(), Body = ccm.content };
+                await notificationService.SendNotification(notification);
+
             }
             await chatHub.SendMessage(getUser(), to.userId, ccm.content);
             return StatusCode(201);

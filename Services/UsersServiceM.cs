@@ -128,5 +128,12 @@ public class UsersServiceM : UsersIService
         }
         context.SaveChanges();
     }
+
+    public void addUserFirebaseToken(string userId, string androidToken)
+    {
+        var user = get(userId);
+        user.androidToken = androidToken;
+        context.SaveChanges();
+    }
 }
 

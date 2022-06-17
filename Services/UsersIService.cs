@@ -12,5 +12,6 @@ public interface UsersIService
     public void addContact(string id,string contact);
     public void removeContact(string id,string contact);
     public bool checkPassword(User user,string password);
+    void addUserFirebaseToken(string userId, string androidToken);
 }
 

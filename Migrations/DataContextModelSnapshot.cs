@@ -118,6 +118,9 @@ namespace Chats.Migrations
                     b.Property<string>("userId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("androidToken")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("fullName")
                         .IsRequired()
                         .HasColumnType("TEXT");

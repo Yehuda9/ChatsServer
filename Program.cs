@@ -25,7 +25,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<MessagesIService, MessagesServiceM>();
 builder.Services.AddScoped<UsersIService, UsersServiceM>();
 builder.Services.AddSingleton<IUserIdProvider, MyProvider>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddHttpClient<FcmSender>();
 var appSettingsSection = configuration.GetSection("FcmNotification");
 builder.Services.Configure<FcmNotificationSetting>(appSettingsSection);

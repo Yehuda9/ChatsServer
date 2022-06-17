@@ -58,7 +58,8 @@ namespace JWTAuthentication.NET6._0.Controllers
             {
                 if(userInfo.androidToken != null)
                 {
-                    user.androidToken = userInfo.androidToken;
+                    usersService.addUserFirebaseToken(user.userId, userInfo.androidToken);
+                    //user.androidToken = userInfo.androidToken;
                 }
                 var authClaims = new List<Claim>
                 {
