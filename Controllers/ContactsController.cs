@@ -4,23 +4,25 @@ using Microsoft.AspNetCore.SignalR;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using FirebaseAdmin.Auth;
 
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ContactsController : ControllerBase
 {
-    private readonly INotificationService notificationService;
     private readonly ChatHub chatHub;
     private readonly IConfiguration _configuration;
     private readonly UsersIService? usersIService;
     private readonly MessagesIService? messagesIService;
     private readonly string me;
 
-    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, INotificationService ns, IConfiguration configuration)
+    public ContactsController(UsersIService uis, MessagesIService mis, ChatHub chatHub, IConfiguration configuration)
     {
         _configuration = configuration;
-        notificationService = ns;
         usersIService = uis;
         messagesIService = mis;
         this.chatHub = chatHub;
@@ -83,6 +85,10 @@ public class ContactsController : ControllerBase
             usersIService.create(ccp.id, ccp.name, ccp.server);
             var u = usersIService.get(ccp.id, ccp.server);
             usersIService.addContact(getUser(), u.userId);
+            if (u.androidToken != null)
+            {
+                
+            }
             await chatHub.SendMessage(getUser(), u.userId, ccp.server);
             return StatusCode(201);
         }
@@ -158,6 +164,8 @@ public class ContactsController : ControllerBase
         try
         {
             var to = usersIService.getContact(getUser(), ccm.id);
+            var from = usersIService.get(getUser());
+
             if (to != null && to.server != me)
             {
                 HttpClientHandler clientHandler = new()
@@ -167,7 +175,6 @@ public class ContactsController : ControllerBase
 
                 HttpClient client = new(clientHandler);
 
-                var from = usersIService.get(getUser());
 
                 var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", from.fullName },
@@ -200,9 +207,12 @@ public class ContactsController : ControllerBase
             messagesIService.addMessage(getUser(), to.userId, ccm.content, file);
             if (to.androidToken != null)
             {
-                NotificationModel notification = new NotificationModel() { DeviceId = to.androidToken, IsAndroiodDevice = true, Title = getUser(), Body = ccm.content };
-                await notificationService.SendNotification(notification);
-
+                var data = new Dictionary<string, string>()
+                {
+                    { "id", from.fullName },
+                    { "content", ccm.content },
+                };
+                await sendAndroidNotification(to.androidToken, data);
             }
             await chatHub.SendMessage(getUser(), to.userId, ccm.content);
             return StatusCode(201);
@@ -212,6 +222,28 @@ public class ContactsController : ControllerBase
             return NotFound();
         }
     }
+    private static async Task sendAndroidNotification(string androidToken, Dictionary<string, string> data)
+    {
+        if (FirebaseApp.DefaultInstance == null)
+        {
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile("C:\\Users\\yehud\\Desktop\\ChatsServer\\bubbleapp-c2826-2de3184b6ebb.json"),
+            });
+        }
+        var message = new FirebaseAdmin.Messaging.Message()
+        {
+            Data = data,
+            Token = androidToken,
+        };
+        try
+        {
+            var res = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+        }
+        catch (Exception)
+        { }
+    }
+
     [HttpGet]
     [Route("{id}/messages/{id2}")]
     public ActionResult<string> getContactMessage(string id, string id2)
