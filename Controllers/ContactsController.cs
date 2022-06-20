@@ -51,6 +51,7 @@ public class ContactsController : ControllerBase
         }
         try
         {
+            var from = usersIService.get(getUser());
             if (ccp.server != me)
             {
                 HttpClientHandler clientHandler = new()
@@ -59,7 +60,6 @@ public class ContactsController : ControllerBase
                 };
 
                 HttpClient client = new(clientHandler);
-                var from = usersIService.get(getUser());
                 var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "from", from.fullName },
                 { "to", ccp.id },
@@ -87,7 +87,13 @@ public class ContactsController : ControllerBase
             usersIService.addContact(getUser(), u.userId);
             if (u.androidToken != null)
             {
-                
+                var data = new Dictionary<string, string>()
+                {
+                    { "id", from.fullName },
+                    { "server", from.server },
+                    {"action","startChat" }
+                };
+                await sendAndroidNotification(u.androidToken, data);
             }
             await chatHub.SendMessage(getUser(), u.userId, ccp.server);
             return StatusCode(201);
@@ -211,6 +217,8 @@ public class ContactsController : ControllerBase
                 {
                     { "id", from.fullName },
                     { "content", ccm.content },
+                    { "server", from.server },
+                    {"action","newMsg" }
                 };
                 await sendAndroidNotification(to.androidToken, data);
             }
@@ -222,13 +230,13 @@ public class ContactsController : ControllerBase
             return NotFound();
         }
     }
-    private static async Task sendAndroidNotification(string androidToken, Dictionary<string, string> data)
+    public static async Task sendAndroidNotification(string androidToken, Dictionary<string, string> data)
     {
         if (FirebaseApp.DefaultInstance == null)
         {
             FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.FromFile("C:\\Users\\yehud\\Desktop\\ChatsServer\\bubbleapp-c2826-2de3184b6ebb.json"),
+                Credential = GoogleCredential.FromFile("C:\\Users\\yehud\\Desktop\\ChatsServer\\bubbleapp-c2826-56c1721e83e8.json"),
             });
         }
         var message = new FirebaseAdmin.Messaging.Message()

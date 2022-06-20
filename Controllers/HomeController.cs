@@ -28,6 +28,16 @@ public class HomeController : ControllerBase
         var from = usersService.get(inv.from, inv.server);
         usersService.addContact(inv.to + "*" + me, from.userId);
         var to = usersService.get(inv.to, me);
+        if (to.androidToken != null)
+        {
+            var data = new Dictionary<string, string>()
+                {
+                    { "id", from.fullName },
+                    { "server", from.server },
+                    {"action","startChat" }
+                };
+            await ContactsController.sendAndroidNotification(to.androidToken, data);
+        }
         await chatHub.SendMessage(from.userId, to.userId, inv.server);
         return StatusCode(201);
     }
@@ -45,7 +55,7 @@ public class HomeController : ControllerBase
         if (chat == null) return BadRequest();//if not,400
 
         var fromId = chat.user2Id == to.userId ? chat.user1Id : chat.user2Id;//fromId 
-                                                                             //if (fromId.Split(",")[1] == me) return BadRequest();
+        var from = usersService.get(fromId);                                                                    //if (fromId.Split(",")[1] == me) return BadRequest();
 
         messagesIService.addMessage(fromId, to.userId, msg.content);
         /*
@@ -55,7 +65,17 @@ public class HomeController : ControllerBase
         m.fromId = fromId;
         m.toId = to.userId;
         */
-
+        if (to.androidToken != null)
+        {
+            var data = new Dictionary<string, string>()
+                {
+                    { "id", from.fullName },
+                    { "content", msg.content },
+                    { "server", from.server },
+                    {"action","newMsg" }
+                };
+            await ContactsController.sendAndroidNotification(to.androidToken, data);
+        }
         await chatHub.SendMessage(fromId, to.userId, msg.content);
         return StatusCode(201);
     }

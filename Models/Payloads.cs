@@ -20,6 +20,7 @@ public class RegisterPayLoad
     public string name { get; set; }
     public string nickName { get; set; }
     public string password { get; set; }
+    public string? androidToken { get; set; }
     public IFormFile? profileImage { get; set; }
 }
 

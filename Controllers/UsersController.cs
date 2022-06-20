@@ -96,7 +96,8 @@ namespace JWTAuthentication.NET6._0.Controllers
             var loginPayLoad = new LoginPayLoad
             {
                 name = userInfo.name,
-                password = userInfo.password
+                password = userInfo.password,
+                androidToken = userInfo.androidToken,
             };
             return login(loginPayLoad);
         }
