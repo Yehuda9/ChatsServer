@@ -91,7 +91,7 @@ public class ContactsController : ControllerBase
                 {
                     { "id", from.fullName },
                     { "server", from.server },
-                    {"action","startChat" }
+                    {"action","newChat" }
                 };
                 await sendAndroidNotification(u.androidToken, data);
             }
@@ -218,7 +218,7 @@ public class ContactsController : ControllerBase
                     { "id", from.fullName },
                     { "content", ccm.content },
                     { "server", from.server },
-                    {"action","newMsg" }
+                    {"action","newMessage" }
                 };
                 await sendAndroidNotification(to.androidToken, data);
             }
