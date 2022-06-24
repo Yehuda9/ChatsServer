@@ -8,16 +8,18 @@ public class DataContext : DbContext
     public DbSet<Chat> chats { get; set; }
     public DbSet<Message> messages { get; set; }
 
-    //private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=";
+    private const string connectionString = "server=localhost;port=3306;database=Users;user=root;password=P@$$W0rd";
     public DataContext():base()
     {
         this.ChangeTracker.LazyLoadingEnabled = false;
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string path = Directory.GetCurrentDirectory();
+        optionsBuilder.UseMySql(connectionString, MariaDbServerVersion.AutoDetect(connectionString));
+
+        /*string path = Directory.GetCurrentDirectory();
         var DbPath = Path.Join(path, "mySqliteDB.db");
-        optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        optionsBuilder.UseSqlite($"Data Source={DbPath}");*/
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
