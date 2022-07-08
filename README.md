@@ -3,6 +3,8 @@ firebaseNotification
 כמו כן, העלתי גרסה של השרת לשרתי האוניברסיטה כפי שהודגם במדריך שהעלתם, שם המשתמש שלי הוא 
 schwarye
 בהצלחה.
+על מנת שהפיירבייס יעבוד כמו שצריך, התכנית זקוקה לקובץ עם מפתחות פרטיים להתחברות לפיירבייס, מסיבות ברורות אני לא מפרסם מפתחות פרטיים ברפו ציבורי, אנא צרו איתי קשר אם הדבר יוצר בעיות, אני אשלח לכם את הקובץ.
+yehuda7701@gmail.com
 
 ## NOTE: This backend repo contains frontend parts (compiled react project) which are NOT relevant to the backend. Please ignore the wwwroot folder and the app-frontend it contains. The frontend part of the project is in repo "ex1" which is also submitted in the submition text file.
 # ChatsServer
